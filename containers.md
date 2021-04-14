@@ -22,11 +22,21 @@ The materials for this tutorial are available using git at the short URL ([tinyu
 
 This training session will cover the following topics:
 
-# Introduction to containers
+- Introduction to containers
+   - Comparison with VMs
+   - Docker and Singularity
+   - Advantages of containers
+- Basic usage of containers
+   - Demo of running a Singularity container
+   - More details on running a container
+   - Use with Slurm
+   - Sources of images
 
-## What is a container
+(need to add outline items for Wei, Oliver, Nicolas sections)
 
- - Containerization provides an isolated environment in which you can install your software and dependencies. 
+# What is a container?
+
+ - Containerization provides "lightweight, standalone, executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries and settings".
  - Containers are similar to virtual machines in some ways, but much lighter-weight.
  - Containers are portable, shareable, and reproducible.
 
@@ -35,28 +45,30 @@ Terminology:
 - image: a bundle of files, including the operating system, software, and possibly data and files associated with the software
    - may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)
 - container: a virtual environment based on an image (i.e., a running instance of an image)
-   
+
+(can we find/create a good graphic?)
 
 ## Containers versus VMs
 
 perhaps show a figure - try to edit Wei's figure
 
-## Why use containers
- - portability - install once, run 'anywhere'
- - control your environment/software on systems (such as Savio, XSEDE) you don't own
- - manage complex dependencies by using containers for modular computational workflows/pipelines, one workflow per container
- - provide a reproducible environment
+# Why use containers?
+
+ - Portability - install once, run 'anywhere'
+ - Control your environment/software on systems (such as Savio, XSEDE) you don't own
+ - Manage complex dependencies by using containers for modular computational workflows/pipelines, one workflow per container
+ - Provide a reproducible environment
      - for yourself in the future
      - for others (lab members)
      - for a publication 
- - run work that requires outdated versions of software or OS
- - test your code on various configurations or OSes	 
+ - Run work that requires outdated versions of software or OS
+ - Test your code on various configurations or OSes	 
 
-## Limitations of containers
+# Limitations of containers
 
 (see SDSC training)
 
-## Docker vs. Singularity
+# Docker vs. Singularity
 
 What is Docker?
 
@@ -73,53 +85,78 @@ What is Singularity?
 - Developed at LBL by Greg Kurtzer
 - Typically users have a build system as root users, but may not be root users on a production system
 
-How Singularity can leverage Docker.
+How can Singularity can leverage Docker?
+- Create a container based on a Docker image
+- (transform a Dockerfile?)
+- other?
 
-Running Singularity containers on Savio, including using Docker images
+# Examples of where containers are used
 
-## Examples of where containers are used
-
-- Kubernetes
-- MyBinder
-- check runMyCode, etc.
-
-## perhaps other related slides
+- Kubernetes runs pods based on Docker images
+- MyBinder creates an executable environment by building a Docker image
+- CodeOcean capsules are build on Docker images 
 
 # Basic container use
 
-## Running pre-existing containers using Singularity
+# Running pre-existing containers using Singularity
 
 - No root/sudo privilege is needed
 - Create/download immutable squashfs images/containers
 ```
 singularity pull --help
 ```
-- Docker Hub:  Pull a container from Docker Hub.
+- DockerHub: Pull a container from DockerHub.
 ```
 $ singularity pull docker://ubuntu:18.04 
-$ singularity pull docker://gcc:7.2.0
+$ singularity pull docker://rocker/r-base:latest
+$ singularity pull docker://postgres
+$ ls -lrt | tail -n 10   # careful of your quota!
+$ ls -l ~/.singularity
 ```
 
 ```
-singularity run docker://ubuntu:18.04
+singularity run ubuntu_18.04.sif       # use downloaded image file
+## alternatively, use ~/.singularity/cache
+singularity run docker://ubuntu:18.04  
 ```
 
-- Singularity Hub:  If no tag is specified, the master branch of the repository is used
+Note the change in prompt.
+
+```
+cat /etc/issue   # not the Savio OS!
+which python     # not much here!
+pwd
+echo "written from the container" > junk.txt
+ls /global/scratch/paciorek | head -n 5
+exit
+cat junk.txt
+```
+
+```
+singularity run docker://rocker/r-base    # easy!
+singularity run docker://postgres         # sometimes things are complicated!
+```
+
+# Other ways of running a container
+
+- Singularity Hub: If no tag is specified, the master branch of the repository is used
 
 ```
 $ singularity pull hello-world.sif shub://singularityhub/hello-world
 $ singularity run hello-world.sif
 ```
 
-## Other ways of running a container
+Here's how one runs a Docker container (on a system where you have admin access):
 
-(also show same container running via Docker on personal system)
-(also show direct usage of a Singularity container)
+```
+echo $HOME
+docker run -it --rm rocker/r-base bash
+pwd
+ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory
+```
 
 
-
-
-## Different ways of using a Singularity container
+# Different ways of using a Singularity container
 
 - **shell** sub-command: invokes an interactive shell within a container
 ```
@@ -134,15 +171,26 @@ singularity run hello-world.sif
 singularity exec hello-world.sif cat /etc/os-release
 ```
 
-`singularity inspect -r file.sif`
+`singularity inspect -r hello-world.sif`
 
-## Container processes on the host system
+# Container processes on the host system
 
-Show what seen in terms of a container application with ps and top
+Let's see how the container processes show up from the perspective of the host OS.
 
-(run some intensive Python calculation with multiple cores on a Python Docker-based container)
+We'll run some intensive linear algebra in R.
 
-## Accessing the Savio filesystems and bind paths
+```
+singularity run docker://rocker/r-base:latest
+```
+
+```r
+a <- matrix(rnorm(10000^2), 10000)
+system.time(chol(crossprod(a)))
+```
+
+We see in `top` that the R process in the container shows up as an R process on the host.
+
+# Accessing the Savio filesystems and bind paths
 
 - Singularity allow mapping directories on host to directories within container
 - Easy data access within containers
@@ -153,36 +201,42 @@ Show what seen in terms of a container application with ps and top
 - e.g.: mount  /host/path/ on the host to /container/path inside the container via `-B /host/path/:/container/path`, e.g.,
 
 ```
-singularity shell -B /global/home/users/$USER/mydir:/tmp/my_personal_dir pytorch_19_12_py3.sif 
+ls /global/scratch/paciorek/wikistats_small
+singularity shell -B /global/scratch/paciorek/wikistats_small:/data hello-world.sif
+ls /data
+touch /data/erase-me
+exit
+ls -l /global/scratch/paciorek/wikistats_small
 ```
 
-## Running containers on Savio via Slurm
+In general one would do I/O to data on the host system rather than writing into the container.
 
-quick demo srun
-show what goes into an sbatch job script
+It is possible to create writeable containers. 
+
+# Running containers on Savio via Slurm
+
+You can run Singularity within an `sbatch` or `srun` session.
+
+Here's a basic job script.
 
 ```
-#!/bin/bash -l
+#!/bin/bash 
 #SBATCH --job-name=container-test		 
-#SBATCH --partition=lr5			 
-#SBATCH --account=ac_xxx		 
-#SBATCH --qos=lr_normal			
-#SBATCH --nodes=1			
-#SBATCH --time=1-2:0:0			
+#SBATCH --partition=savio2		 
+#SBATCH --account=co_stat		 			
+#SBATCH --time=5:00		
 
-cd $SLURM_SUBMIT_DIR
-singularity exec mycontainer.sif cat /etc/os-release
+singularity exec hello-world.sif cat /etc/os-release
 ```
 
-
-## Sources of container images
+# Sources of container images
 
 - DockerHub
 - SingularityHub
 
-## Singularity workflow (leading into Nicolas' material)
+# Singularity workflow (leading into Nicolas' material)
 
-- install Singularity locally (or build an image in the cloud) (link to Wei instructions)
+- [install Singularity locally](https://docs.google.com/document/d/10XAtH9yj5uyiHr3eGHTk9h82bZXEp0aixMCmgYJhGNQ/edit?usp=sharing) (or build an image in the cloud) 
 - transfer image to Savio
 - run container on Savio
 
@@ -194,12 +248,12 @@ singularity exec mycontainer.sif cat /etc/os-release
 
 # Other container resources
 
-https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/
-https://github.com/XSEDE/Container_Tutorial
-https://carpentries-incubator.github.io/docker-introduction/index.html
-https://carpentries-incubator.github.io/singularity-introduction/
+- [San Diego supercomputing center training](https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/)
+- [XSEDE tutorial](https://github.com/XSEDE/Container_Tutorial)
+- [Software Carpentries Docker training](https://carpentries-incubator.github.io/docker-introduction/index.html)
+- [Software Carpentries Singularity training](https://carpentries-incubator.github.io/singularity-introduction/)
 
-list various tutorials/trainings - see Google doc
+(any others?)
 
 # How to get additional help
 
