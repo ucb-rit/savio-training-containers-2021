@@ -242,6 +242,54 @@ singularity exec hello-world.sif cat /etc/os-release
 
 # Nicolas' content
 
+# Approaches to Building
+- Build a Docker image and convert
+  - Convenient if you already have a Docker build file
+- Build from Singularity definition file
+  - Bootstrap from another Singularity container or non-Docker base OS
+  - Alows extra customization with directives
+
+# Building a Docker container
+```docker
+FROM ubuntu:18.04
+RUN mkdir -p /app
+```
+
+- TODO: cover ENTRYPOINT and CMD
+
+# Pushing to Docker Registry
+TODO
+
+# Converting Docker to Singularity
+- `singularity run docker://...`
+- `singularity build test.simg docker://`
+
+Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md
+
+# Singularity Definition File
+1. **Header**: Base to build the container off of, such as an existing Docker/Singularity/OS image
+2. **Sections**: Denoted by a `%` which are executed once the container is built to configure it
+
+Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
+
+# Singularity Build Example
+- TODO: add example simg file
+
+Reference: https://github.com/ucb-rit/savio-singularity-template
+
+# Singularity Build Options
+- Install Singularity locally
+- Install Docker locally and use singularity-docker
+  - https://github.com/singularityhub/singularity-docker
+- Build an image on a cloud service or continuous integration host
+  - Sylabs Remote Builder: https://cloud.sylabs.io/builder
+
+# Rewritable/Sandbox Singularity Images
+TODO
+
+# Pushing to Singularity Registry
+TODO
+
 # Wei's content
 
 # Oliver's content
