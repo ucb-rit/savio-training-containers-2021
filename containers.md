@@ -43,22 +43,27 @@ This training session will cover the following topics:
  - Containers are similar to virtual machines in some ways, but much lighter-weight.
  - Containers are portable, shareable, and reproducible.
 
-Terminology:
+# Terminology/Overview
 
-- image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
-   - may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)
-- container: a virtual environment based on an image (i.e., a running instance of an image)
-   - software running in the container sees this environment
+ - image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
+    - may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)
+ - container: a virtual environment based on an image (i.e., a running instance of an image)
+    - software running in the container sees this environment
+ - registry: a source of images
 
+# Terminology/Overview, take 2
 
-(can we find/create a good graphic?)
+<center><img src="taxonomy-of-docker-terms-and-concepts.png"></center>
 
-see vm versus container graphic here:
-https://github.com/XSEDE/Container_Tutorial/blob/master/Gateways2020/Day1_1_Introduction-to-Containers.pdf
+(Image from docs.microsoft.com)
 
-## Containers versus VMs
+# Containers versus VMs
 
-perhaps show a figure - try to edit Wei's figure
+Let's see a schematic of what is going on with a container.
+
+<center><img src="vm_vs_container.png"></center>
+
+(Image from Tin Ho, github.com/tin6150)
 
 VMs have a copy of the entire operating system and need to be booted up, while containers use the Linux kernel of the host machine and processes running in the container can be seen as individual processes on the host.
 
@@ -70,19 +75,23 @@ VMs have a copy of the entire operating system and need to be booted up, while c
  - Provide a reproducible environment:
      - for yourself in the future,
      - for others (lab members),
-     - for software you develop,
+     - for software you develop and want to distribute,
      - for a publication.
- - Run work that requires outdated or updated versions of software or OS or an OS you don't have.
- - Test your code on various configurations or OSes.
+ - Flexibility in using various software or application versions:
+     - use outdated or updated versions of software or OS
+     - use an OS you don't have.
+     - test your code on various configurations or OSes.
  - High performance compared to VMs.
 
 Much of this comes down to the fact that your workflow can depend in a fragile way on one or more pieces of software that may be difficult to install or keep operational.
 
 # Limitations of containers
 
-- Another level of abstraction/indirection can be confusing
-- Can run into host-container incompatibilities (e.g., MPI, GPUs)
-- Limitations in going between CPU architectures (e.g., x86_64 versus ARM)
+ - Another level of abstraction/indirection can be confusing
+    - 'Where' am I?
+    - Where are my files?
+ - Can run into host-container incompatibilities (e.g., MPI, GPUs)
+ - Limitations in going between CPU architectures (e.g., x86_64 versus ARM)
 
 # Docker vs. Singularity
 
@@ -193,7 +202,9 @@ singularity run hello-world.sif
 singularity exec hello-world.sif cat /etc/os-release
 ```
 
-`singularity inspect -r hello-world.sif`
+```
+singularity inspect -r hello-world.sif
+```
 
 # Container processes on the host system
 
@@ -214,14 +225,15 @@ We see in `top` that the R process running in the container shows up as an R pro
 
 # Accessing the Savio filesystems and bind paths
 
-- Singularity allow mapping directories on host to directories within container
-- Easy data access within containers
-- System-defined bind paths on Savio
-        - /global/home/users/
-        - /global/scratch/
-        - /tmp
-- User can define own bind paths: 
-- e.g.: mount  /host/path/ on the host to /container/path inside the container via `-B /host/path/:/container/path`, e.g.,
+ - Singularity allow mapping directories on host to directories within container
+ - Easy data access within containers
+ - System-defined bind paths on Savio
+     - `/global/home/users/`
+     - `/global/scratch/`
+     - `/tmp`
+ - User can define own bind paths: 
+     - mount /host/path/ on the host to /container/path inside the container
+     - `-B /host/path/:/container/path`
 
 ```
 ls /global/scratch/paciorek/wikistats_small
@@ -252,15 +264,17 @@ Here's a basic job script.
 singularity exec hello-world.sif cat /etc/os-release
 ```
 
-# Sources of container images
+# Sources of container images (registries)
 
 - [DockerHub](https://hub.docker.com)
-- [SingularityHub](https://singularity-hub.org)
+- [SingularityHub (future is up in the air)](https://singularity-hub.org)
+- [Sylabs container registry](https://cloud.sylabs.io/library)
 
-DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG, e.g., [https://hub.docker.com/u/continuumio](https://hub.docker.com/u/continuumio).
+DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG.
 
-For images provided by Docker, you don't specify the OWNER.
+Let's see an [example of the Continuum images](https://hub.docker.com/u/continuumio).
 
+(For images provided by Docker, you don't specify the OWNER.)
 
 
 # Singularity workflow (leading into Nicolas' material)

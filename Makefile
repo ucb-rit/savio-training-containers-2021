@@ -1,9 +1,9 @@
 all: containers.html containers_slides.html
 
-intro.html: intro.md
+containers.html: containers.md
 	pandoc -s -o containers.html containers.md
 
-intro_slides.html: intro.md
+containers_slides.html: containers.md
 	pandoc -s --webtex -t slidy -o containers_slides.html containers.md
 
 clean:
