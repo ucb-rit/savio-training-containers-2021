@@ -17,5 +17,5 @@ From: alpine:latest
   echo "Post finished"
 
 %runscript
-  # Executed with `singularity run arch-example.simg` or `./arch-example.simg`
+  # Executed with `singularity run alpine-example.simg` or `./alpine-example.simg`
   asciiquarium
