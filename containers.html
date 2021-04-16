@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="April 21, 2021" />
+  <title>Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows</h1>
+<h2 class="author">April 21, 2021</h2>
+<h3 class="date">Nicolas Chan, Wei Feinstein, Oliver Muellerklein, and Chris Paciorek</h3>
+</div>
+<h1 id="upcoming-events-and-hiring">Upcoming events and hiring</h1>
+<ul>
+<li><p>Looking for researchers working with sensitive data as we are building tools and services to support that work. Get in touch for more information.</p></li>
+<li><p>Research IT is hiring graduate and undergraduate students for a variety of positions. Please talk to Amy Neeser to get more information.</p></li>
+<li><p><a href="https://www.meetup.com/ucberkeley_cloudmeetup/">Cloud Computing Meetup</a> (monthly, with next meeting April 29 at 1 pm)</p></li>
+<li><p><a href="https://dlab.berkeley.edu/working-groups/securing-research-data-working-group">Securing Research Data Working Group</a> (monthly, with next meeting May 10 at 2 pm)</p></li>
+</ul>
+<h1 id="introduction">Introduction</h1>
+<p>We'll do this mostly as a demonstration. We encourage you to login to your account and try out the various examples yourself as we go through them.</p>
+<p>The materials for this tutorial are available using git at the short URL (<a href="https://tinyurl.com/brc-apr21">tinyurl.com/brc-apr21</a>), the GitHub URL (<a href="https://github.com/ucb-rit/savio-training-containers-2021" class="uri">https://github.com/ucb-rit/savio-training-containers-2021</a>), or simply as a <a href="https://github.com/ucb-rit/savio-training-containers-2021/archive/main.zip">zip file</a>.</p>
+<h1 id="outline">Outline</h1>
+<p>This training session will cover the following topics:</p>
+<ul>
+<li>Introduction to containers</li>
+<li>Comparison with VMs</li>
+<li>Docker and Singularity</li>
+<li>Advantages of containers</li>
+<li>Basic usage of containers</li>
+<li>Demo of running a Singularity container</li>
+<li>More details on running a container</li>
+<li>Use with Slurm</li>
+<li>Sources of images</li>
+</ul>
+<p>(need to add outline items for Wei, Oliver, Nicolas sections)</p>
+<h1 id="what-is-a-container">What is a container?</h1>
+<ul>
+<li>Containerization provides &quot;lightweight, standalone, executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries and settings&quot;.</li>
+<li>A container provides a self-contained (isolated) filesystem.</li>
+<li>Containers are similar to virtual machines in some ways, but much lighter-weight.</li>
+<li>Containers are portable, shareable, and reproducible.</li>
+</ul>
+<p>Terminology:</p>
+<ul>
+<li>image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software</li>
+<li>may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)</li>
+<li>container: a virtual environment based on an image (i.e., a running instance of an image)</li>
+<li>software running in the container sees this environment</li>
+</ul>
+<center>
+<img src="taxonomy-of-docker-terms-and-concepts.png">
+</center>
+<p>(Image from docs.microsoft.com)</p>
+<h2 id="containers-versus-vms">Containers versus VMs</h2>
+<p>Let's see a schematic of what is going on with a container.</p>
+<center>
+<img src="vm_vs_container.png">
+</center>
+<p>(Image from Tin Ho, github.com/tin6150)</p>
+<p>VMs have a copy of the entire operating system and need to be booted up, while containers use the Linux kernel of the host machine and processes running in the container can be seen as individual processes on the host.</p>
+<h1 id="why-use-containers">Why use containers?</h1>
+<ul>
+<li>Portability - install once, run &quot;anywhere&quot;.</li>
+<li>Control your environment/software on systems (such as Savio, XSEDE) you don't own.</li>
+<li>Manage complex dependencies/installations by using containers for modular computational workflows/pipelines, one workflow per container.</li>
+<li>Provide a reproducible environment:
+<ul>
+<li>for yourself in the future,</li>
+<li>for others (lab members),</li>
+<li>for software you develop,</li>
+<li>for a publication.</li>
+</ul></li>
+<li>Run work that requires outdated or updated versions of software or OS or an OS you don't have.</li>
+<li>Test your code on various configurations or OSes.</li>
+<li>High performance compared to VMs.</li>
+</ul>
+<p>Much of this comes down to the fact that your workflow can depend in a fragile way on one or more pieces of software that may be difficult to install or keep operational.</p>
+<h1 id="limitations-of-containers">Limitations of containers</h1>
+<ul>
+<li>Another level of abstraction/indirection can be confusing</li>
+<li>Can run into host-container incompatibilities (e.g., MPI, GPUs)</li>
+<li>Limitations in going between CPU architectures (e.g., x86_64 versus ARM)</li>
+</ul>
+<h1 id="docker-vs.-singularity">Docker vs. Singularity</h1>
+<p>What is Docker?</p>
+<ul>
+<li>Open-source computer software that encapsulates an application and all its dependencies into a single image, as a series of layers</li>
+<li>Brings containerization to the individuals on their own machines</li>
+<li>Rich image repository</li>
+<li>Widely used by scientific communities</li>
+<li>Security concerns make it unsuitable for the HPC environment</li>
+<li>By default you are root in the container</li>
+</ul>
+<p>What is Singularity?</p>
+<ul>
+<li>Open-source computer software that encapsulates an application and all its dependencies into a single image, as a single file</li>
+<li>Brings containerization to Linux clusters and HPC</li>
+<li>Developed at LBL by Greg Kurtzer</li>
+<li>Typically users have a machine on which they have admin privileges and can't build images but don't have admin privileges where the containers are run</li>
+<li>You are yourself (from the host machine) in the container</li>
+</ul>
+<p>How can Singularity can leverage Docker?</p>
+<ul>
+<li>Create and run a Singularity container based on a Docker image</li>
+<li>(transform a Dockerfile?)</li>
+<li>Create Singularity images by running Singularity in a Docker container</li>
+<li>other?</li>
+</ul>
+<h1 id="examples-of-where-containers-are-used">Examples of where containers are used</h1>
+<ul>
+<li>Kubernetes runs pods based on Docker images</li>
+<li>MyBinder creates an executable environment by building a Docker image</li>
+<li>You can have GitHub Actions and Bitbucket Pipelines in a Docker container</li>
+<li>CodeOcean capsules are built on Docker images</li>
+</ul>
+<h1 id="running-pre-existing-containers-using-singularity">Running pre-existing containers using Singularity</h1>
+<ul>
+<li>No root/sudo privilege is needed</li>
+<li>Create/download immutable squashfs images/containers</li>
+</ul>
+<pre><code>singularity pull --help</code></pre>
+<ul>
+<li><p>DockerHub: Pull a container from DockerHub.</p>
+<pre><code>$ singularity pull docker://ubuntu:18.04 
+$ singularity pull docker://rocker/r-base:latest
+$ singularity pull docker://postgres
+$ ls -lrt | tail -n 10   # careful of your quota!
+$ ls -l ~/.singularity
+$ singularity cache list</code></pre></li>
+</ul>
+<pre><code>singularity run ubuntu_18.04.sif       # use downloaded image file
+## alternatively, use ~/.singularity/cache
+singularity run docker://ubuntu:18.04  </code></pre>
+<p>Note the change in prompt.</p>
+<pre><code>cat /etc/issue   # not the Savio OS!
+which python     # not much here!
+pwd
+echo &quot;written from the container&quot; &gt; junk.txt
+ls /global/scratch/paciorek | head -n 5
+exit
+cat junk.txt</code></pre>
+<pre><code>singularity run docker://rocker/r-base    # easy!
+singularity run docker://postgres         # sometimes things are complicated!</code></pre>
+<h1 id="other-ways-of-running-a-container">Other ways of running a container</h1>
+<ul>
+<li>Singularity Hub: If no tag is specified, the master branch of the repository is used</li>
+</ul>
+<pre><code>$ singularity pull hello-world.sif shub://singularityhub/hello-world
+$ singularity run hello-world.sif</code></pre>
+<p>Here's how one runs a Docker container (on a system where you have admin access):</p>
+<pre><code>echo $HOME
+docker run -it --rm rocker/r-base bash
+pwd
+ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory</code></pre>
+<h1 id="different-ways-of-using-a-singularity-container">Different ways of using a Singularity container</h1>
+<ul>
+<li><p><strong>shell</strong> sub-command: invokes an interactive shell within a container</p>
+<pre><code>singularity shell hello-world.sif</code></pre></li>
+<li><p><strong>run</strong> sub-command: executes the container’s runscript</p>
+<pre><code>singularity run hello-world.sif</code></pre></li>
+<li><p><strong>exec</strong> sub-command: execute an arbitrary command within container</p>
+<pre><code>singularity exec hello-world.sif cat /etc/os-release</code></pre></li>
+</ul>
+<p><code>singularity inspect -r hello-world.sif</code></p>
+<h1 id="container-processes-on-the-host-system">Container processes on the host system</h1>
+<p>Let's see how the container processes show up from the perspective of the host OS.</p>
+<p>We'll run some intensive linear algebra in R.</p>
+<pre><code>singularity run docker://rocker/r-base:latest</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">10000</span><span class="op">^</span><span class="dv">2</span>), <span class="dv">10000</span>)
+<span class="kw">system.time</span>(<span class="kw">chol</span>(<span class="kw">crossprod</span>(a)))</code></pre></div>
+<p>We see in <code>top</code> that the R process running in the container shows up as an R process on the host.</p>
+<h1 id="accessing-the-savio-filesystems-and-bind-paths">Accessing the Savio filesystems and bind paths</h1>
+<ul>
+<li>Singularity allow mapping directories on host to directories within container</li>
+<li>Easy data access within containers</li>
+<li>System-defined bind paths on Savio - /global/home/users/ - /global/scratch/ - /tmp</li>
+<li>User can define own bind paths:</li>
+<li>e.g.: mount /host/path/ on the host to /container/path inside the container via <code>-B /host/path/:/container/path</code>, e.g.,</li>
+</ul>
+<pre><code>ls /global/scratch/paciorek/wikistats_small
+singularity shell -B /global/scratch/paciorek/wikistats_small:/data hello-world.sif
+ls /data
+touch /data/erase-me
+exit
+ls -l /global/scratch/paciorek/wikistats_small</code></pre>
+<p>In general one would do I/O to data on the host system rather than writing into the container.</p>
+<p>It is possible to create writeable containers.</p>
+<h1 id="running-containers-on-savio-via-slurm">Running containers on Savio via Slurm</h1>
+<p>You can run Singularity within an <code>sbatch</code> or <code>srun</code> session.</p>
+<p>Here's a basic job script.</p>
+<pre><code>#!/bin/bash 
+#SBATCH --job-name=container-test        
+#SBATCH --partition=savio2       
+#SBATCH --account=co_stat                   
+#SBATCH --time=5:00     
+
+singularity exec hello-world.sif cat /etc/os-release</code></pre>
+<h1 id="sources-of-container-images-registries">Sources of container images (registries)</h1>
+<ul>
+<li><a href="https://hub.docker.com">DockerHub</a></li>
+<li><a href="https://singularity-hub.org">SingularityHub (future is up in the air)</a></li>
+<li><a href="https://cloud.sylabs.io/library">Sylabs container registry</a></li>
+</ul>
+<p>DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG, e.g., <a href="https://hub.docker.com/u/continuumio" class="uri">https://hub.docker.com/u/continuumio</a>.</p>
+<p>For images provided by Docker, you don't specify the OWNER.</p>
+<h1 id="singularity-workflow-leading-into-nicolas-material">Singularity workflow (leading into Nicolas' material)</h1>
+<ul>
+<li><a href="https://docs.google.com/document/d/10XAtH9yj5uyiHr3eGHTk9h82bZXEp0aixMCmgYJhGNQ/edit?usp=sharing">install Singularity locally</a> (or build an image in the cloud)</li>
+<li>transfer image to Savio</li>
+<li>run container on Savio</li>
+</ul>
+<h1 id="nicolas-content">Nicolas' content</h1>
+<h1 id="approaches-to-building">Approaches to Building</h1>
+<ul>
+<li>Build a Docker image and convert</li>
+<li>Convenient if you already have a Docker build file</li>
+<li>Build from Singularity definition file</li>
+<li>Bootstrap from another Singularity container or non-Docker base OS</li>
+<li>Alows extra customization with directives</li>
+</ul>
+<h1 id="building-a-docker-container">Building a Docker container</h1>
+<pre class="docker"><code>FROM ubuntu:18.04
+RUN mkdir -p /app</code></pre>
+<ul>
+<li>TODO: cover ENTRYPOINT and CMD</li>
+</ul>
+<h1 id="pushing-to-docker-registry">Pushing to Docker Registry</h1>
+<p>TODO</p>
+<h1 id="converting-docker-to-singularity">Converting Docker to Singularity</h1>
+<ul>
+<li><code>singularity run docker://...</code></li>
+<li><code>singularity build test.simg docker://</code></li>
+</ul>
+<p>Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md</p>
+<h1 id="singularity-definition-file">Singularity Definition File</h1>
+<ol style="list-style-type: decimal">
+<li><strong>Header</strong>: Base to build the container off of, such as an existing Docker/Singularity/OS image</li>
+<li><strong>Sections</strong>: Denoted by a <code>%</code> which are executed once the container is built to configure it</li>
+</ol>
+<p>Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html</p>
+<h1 id="singularity-build-example">Singularity Build Example</h1>
+<ul>
+<li>TODO: add example simg file</li>
+</ul>
+<p>Reference: https://github.com/ucb-rit/savio-singularity-template</p>
+<h1 id="singularity-build-options">Singularity Build Options</h1>
+<ul>
+<li>Install Singularity locally</li>
+<li>Install Docker locally and use singularity-docker</li>
+<li>https://github.com/singularityhub/singularity-docker</li>
+<li>Build an image on a cloud service or continuous integration host</li>
+<li>Sylabs Remote Builder: https://cloud.sylabs.io/builder</li>
+</ul>
+<h1 id="rewritablesandbox-singularity-images">Rewritable/Sandbox Singularity Images</h1>
+<p>TODO</p>
+<h1 id="pushing-to-singularity-registry">Pushing to Singularity Registry</h1>
+<p>TODO</p>
+<h1 id="weis-content">Wei's content</h1>
+<h1 id="olivers-content">Oliver's content</h1>
+<h1 id="other-container-resources">Other container resources</h1>
+<ul>
+<li><a href="https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/">San Diego supercomputing center training</a></li>
+<li><a href="https://github.com/XSEDE/Container_Tutorial">XSEDE tutorial</a></li>
+<li><a href="https://carpentries-incubator.github.io/docker-introduction/index.html">Software Carpentries Docker training</a></li>
+<li><a href="https://carpentries-incubator.github.io/singularity-introduction/">Software Carpentries Singularity training</a></li>
+</ul>
+<p>(any others?)</p>
+<h1 id="how-to-get-additional-help">How to get additional help</h1>
+<ul>
+<li>Check the Status and Announcements page:
+<ul>
+<li><a href="https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements" class="uri">https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements</a></li>
+</ul></li>
+<li>For technical issues and questions about using Savio:
+<ul>
+<li>brc-hpc-help@berkeley.edu</li>
+</ul></li>
+<li>For questions about computing resources in general, including cloud computing:
+<ul>
+<li>brc@berkeley.edu</li>
+<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
+</ul></li>
+<li>For questions about data management (including HIPAA-protected data):
+<ul>
+<li>researchdata@berkeley.edu</li>
+<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
+</ul></li>
+</ul>
+</body>
+</html>
