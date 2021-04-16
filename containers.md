@@ -4,13 +4,15 @@
 
 # Upcoming events and hiring
 
- - [Cloud Computing Meetup](https://www.meetup.com/ucberkeley_cloudmeetup/) (monthly) 
+ - Looking for researchers working with sensitive data as we are building tools and services to support that work. Get in touch for more information.
 
- - Looking for researchers working with sensitive data as we are building tools and services to support that work. Get in touch for more information. 
+ - Research IT is hiring graduate and undergraduate students for a variety of positions. Please talk to Amy Neeser to get more information.
 
- - [Securing Research Data Working Group](https://dlab.berkeley.edu/working-groups/securing-research-data-working-group) (monthly)
+ - [Cloud Computing Meetup](https://www.meetup.com/ucberkeley_cloudmeetup/) (monthly, with next meeting April 29 at 1 pm) 
 
- - Research IT is hiring graduate students as domain consultants. See flyers or talk to one of us.
+ - [Securing Research Data Working Group](https://dlab.berkeley.edu/working-groups/securing-research-data-working-group) (monthly, with next meeting May 10 at 2 pm)
+
+ 
 
 # Introduction
 
@@ -37,74 +39,93 @@ This training session will cover the following topics:
 # What is a container?
 
  - Containerization provides "lightweight, standalone, executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries and settings".
+ - A container provides a self-contained (isolated) filesystem.
  - Containers are similar to virtual machines in some ways, but much lighter-weight.
  - Containers are portable, shareable, and reproducible.
 
 Terminology:
 
-- image: a bundle of files, including the operating system, software, and possibly data and files associated with the software
+- image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
    - may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)
 - container: a virtual environment based on an image (i.e., a running instance of an image)
+   - software running in the container sees this environment
+
 
 (can we find/create a good graphic?)
+
+see vm versus container graphic here:
+https://github.com/XSEDE/Container_Tutorial/blob/master/Gateways2020/Day1_1_Introduction-to-Containers.pdf
 
 ## Containers versus VMs
 
 perhaps show a figure - try to edit Wei's figure
 
+VMs have a copy of the entire operating system and need to be booted up, while containers use the Linux kernel of the host machine and processes running in the container can be seen as individual processes on the host.
+
 # Why use containers?
 
- - Portability - install once, run 'anywhere'
- - Control your environment/software on systems (such as Savio, XSEDE) you don't own
- - Manage complex dependencies by using containers for modular computational workflows/pipelines, one workflow per container
- - Provide a reproducible environment
-     - for yourself in the future
-     - for others (lab members)
-     - for a publication 
- - Run work that requires outdated versions of software or OS
- - Test your code on various configurations or OSes	 
+ - Portability - install once, run "anywhere".
+ - Control your environment/software on systems (such as Savio, XSEDE) you don't own.
+ - Manage complex dependencies/installations by using containers for modular computational workflows/pipelines, one workflow per container.
+ - Provide a reproducible environment:
+     - for yourself in the future,
+     - for others (lab members),
+     - for software you develop,
+     - for a publication.
+ - Run work that requires outdated or updated versions of software or OS or an OS you don't have.
+ - Test your code on various configurations or OSes.
+ - High performance compared to VMs.
+
+Much of this comes down to the fact that your workflow can depend in a fragile way on one or more pieces of software that may be difficult to install or keep operational.
 
 # Limitations of containers
 
-(see SDSC training)
+- Another level of abstraction/indirection can be confusing
+- Can run into host-container incompatibilities (e.g., MPI, GPUs)
+- Limitations in going between CPU architectures (e.g., x86_64 versus ARM)
 
 # Docker vs. Singularity
 
 What is Docker?
 
-- Bring containerization to the community-scale
+- Open-source computer software that encapsulates an application and all its dependencies into a single image, as a series of layers 
+- Brings containerization to the individuals on their own machines
 - Rich image repository
 - Widely used by scientific communities
-- Compose for defining multi-container, recipe/definition file to build docker images
-- Security concerns not ideal for the HPC environment
+- Security concerns make it unsuitable for the HPC environment
+- By default you are root in the container
 
 What is Singularity?
 
-- Open-source computer software that encapsulates an application and all its dependencies into a single image
-- Bring containers and reproducibility to scientific computing and HPC
+- Open-source computer software that encapsulates an application and all its dependencies into a single image, as a single file
+- Brings containerization to Linux clusters and HPC
 - Developed at LBL by Greg Kurtzer
-- Typically users have a build system as root users, but may not be root users on a production system
+- Typically users have a machine on which they have admin privileges and can't build images but don't have admin privileges where the containers are run
+- You are yourself (from the host machine) in the container
 
 How can Singularity can leverage Docker?
-- Create a container based on a Docker image
+
+- Create and run a Singularity container based on a Docker image
 - (transform a Dockerfile?)
+- Create Singularity images by running Singularity in a Docker container
 - other?
 
 # Examples of where containers are used
 
 - Kubernetes runs pods based on Docker images
 - MyBinder creates an executable environment by building a Docker image
-- CodeOcean capsules are build on Docker images 
-
-# Basic container use
+- You can have GitHub Actions and Bitbucket Pipelines in a Docker container
+- CodeOcean capsules are built on Docker images 
 
 # Running pre-existing containers using Singularity
 
 - No root/sudo privilege is needed
 - Create/download immutable squashfs images/containers
+
 ```
 singularity pull --help
 ```
+
 - DockerHub: Pull a container from DockerHub.
 ```
 $ singularity pull docker://ubuntu:18.04 
@@ -112,6 +133,7 @@ $ singularity pull docker://rocker/r-base:latest
 $ singularity pull docker://postgres
 $ ls -lrt | tail -n 10   # careful of your quota!
 $ ls -l ~/.singularity
+$ singularity cache list
 ```
 
 ```
@@ -188,7 +210,7 @@ a <- matrix(rnorm(10000^2), 10000)
 system.time(chol(crossprod(a)))
 ```
 
-We see in `top` that the R process in the container shows up as an R process on the host.
+We see in `top` that the R process running in the container shows up as an R process on the host.
 
 # Accessing the Savio filesystems and bind paths
 
@@ -197,6 +219,7 @@ We see in `top` that the R process in the container shows up as an R process on 
 - System-defined bind paths on Savio
         - /global/home/users/
         - /global/scratch/
+        - /tmp
 - User can define own bind paths: 
 - e.g.: mount  /host/path/ on the host to /container/path inside the container via `-B /host/path/:/container/path`, e.g.,
 
@@ -231,8 +254,14 @@ singularity exec hello-world.sif cat /etc/os-release
 
 # Sources of container images
 
-- DockerHub
-- SingularityHub
+- [DockerHub](https://hub.docker.com)
+- [SingularityHub](https://singularity-hub.org)
+
+DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG, e.g., [https://hub.docker.com/u/continuumio](https://hub.docker.com/u/continuumio).
+
+For images provided by Docker, you don't specify the OWNER.
+
+
 
 # Singularity workflow (leading into Nicolas' material)
 
