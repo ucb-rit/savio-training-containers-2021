@@ -1,0 +1,21 @@
+Bootstrap: docker
+From: alpine:latest
+
+%setup
+  # Executed on host system before container is built
+  echo "Hello from setup"
+
+%environment
+  export MY_VAR=my_var_value
+
+%post
+  # Executed within the container at build time
+  echo "Post starting"
+  apk add asciiquarium
+  mkdir -p /app
+  echo 'echo $MY_VAR' >> /app/hello.sh
+  echo "Post finished"
+
+%runscript
+  # Executed with `singularity run arch-example.simg` or `./arch-example.simg`
+  asciiquarium
