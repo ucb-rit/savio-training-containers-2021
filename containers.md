@@ -302,9 +302,21 @@ Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/bui
 Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
 
 # Singularity Build Example
-- TODO: add example simg file
+- Building simple archlinux asciiquarium image: `arch-example.def`
+- `%setup`: Executed on host system before container is built
+- `%environment`: Set environment variables in the container
+- `%post`: Executed within the container at build time
+- `%runscript`: Executed with `singularity run busybox-example.simg` or `./busybox-example.simg`
 
 Reference: https://github.com/ucb-rit/savio-singularity-template
+
+# Singularity Build Example (demo)
+- `sudo singularity build alpine-example.simg alpine-example.def`
+- `singularity run alpine-example.simg`
+- `scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.`
+- On Savio: `singularity run alpine-example.simg`
+- On Savio: `singularity exec alpine-example.simg sh`
+  - `echo $MY_VAR_VALUE`
 
 # Singularity Build Options
 - Install Singularity locally
