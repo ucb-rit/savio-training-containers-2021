@@ -303,7 +303,7 @@ Let's see an [example of the Continuum images](https://hub.docker.com/u/continuu
 ```docker
 FROM centos:7
 RUN yum install -y epel-release && yum install -y cowsay
-ENTRYPOINT /usr/bin/cowsay
+ENTRYPOINT ["/usr/bin/cowsay"]
 ```
 
 See `cowsay-entrypoint` and `cowsay-cmd` in this repository.
@@ -327,11 +327,17 @@ docker run ghcr.io/nicolaschan/cowsay-cmd cowsay hi
 ```
 
 # Pushing to Docker Registry
-TODO
+```bash
+# use docker login to login according to the registry you are using
+docker push ghcr.io/nicolaschan/cowsay-entrypoint:latest
+docker push ghcr.io/nicolaschan/cowsay-cmd:latest
+```
+You can use the Docker container registry of your choice
+or deploy your own registry: https://docs.docker.com/registry/deploying/
 
 # Converting Docker to Singularity
-- `singularity run docker://alpine`
-- `singularity build test.simg docker://alpine`
+- `singularity run docker://ghcr.io/nicolaschan/cowsay-entrypoint hi`
+- `singularity build cowsay.simg docker://ghcr.io/nicolaschan/cowsay-entrypoint`
 
 Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md
 
@@ -398,7 +404,9 @@ hi
 Reference: https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories
 
 # Pushing to Singularity Registry
-TODO
+Similar to Docker registry, you can use the Singularity registry of your choice.
+This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work).
+For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html
 
 # Wei's content
 
