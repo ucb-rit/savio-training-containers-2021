@@ -301,20 +301,59 @@ Let's see an [example of the Continuum images](https://hub.docker.com/u/continuu
 
 # Building a Docker container
 ```docker
-FROM ubuntu:18.04
-RUN mkdir -p /app
+FROM centos:7
+RUN yum install -y epel-release && yum install -y cowsay
+ENTRYPOINT /usr/bin/cowsay
 ```
 
-- TODO: cover ENTRYPOINT and CMD
+See `cowsay-entrypoint` and `cowsay-cmd` in this repository.
+
+Build the container:
+```bash
+docker build -t ghcr.io/nicolaschan/cowsay-entrypoint:latest -f cowsay-entrypoint .
+docker build -t ghcr.io/nicolaschan/cowsay-cmd:latest -f cowsay-cmd .
+```
+
+# Running Docker container
+ENTRYPOINT Docker container:
+```bash
+docker run ghcr.io/nicolaschan/cowsay-entrypoint hi
+```
+
+CMD Docker container (the following do the same thing):
+```bash
+docker run ghcr.io/nicolaschan/cowsay-cmd
+docker run ghcr.io/nicolaschan/cowsay-cmd cowsay hi
+```
 
 # Pushing to Docker Registry
 TODO
 
 # Converting Docker to Singularity
-- `singularity run docker://...`
-- `singularity build test.simg docker://`
+- `singularity run docker://alpine`
+- `singularity build test.simg docker://alpine`
 
 Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md
+
+# Singularity Build Strategies
+- Install Singularity locally (demo today)
+  - Requires root access on your system
+- Install Docker locally and use singularity-docker
+  - https://github.com/singularityhub/singularity-docker
+- Build an image on a cloud service or continuous integration host
+  - Sylabs Remote Builder: https://cloud.sylabs.io/builder
+
+# Suggestions/Pitfalls
+- Match CPU architecture of host where image is built and Savio
+  - Savio is x86_64
+- Savio will try to bind mount the following paths by default (from `/etc/singularity/singularity.conf`):
+
+```
+bind path = /etc/localtime
+bind path = /etc/hosts
+bind path = /global/scratch
+bind path = /global/home/users
+```
 
 # Singularity Definition File
 1. **Header**: Base to build the container off of, such as an existing Docker/Singularity/OS image
@@ -323,7 +362,7 @@ Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/bui
 Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
 
 # Singularity Build Example
-- Building simple archlinux asciiquarium image: `arch-example.def`
+- Building simple alpine asciiquarium image: `alpine-example.def`
 - `%setup`: Executed on host system before container is built
 - `%environment`: Set environment variables in the container
 - `%post`: Executed within the container at build time
@@ -339,15 +378,24 @@ Reference: https://github.com/ucb-rit/savio-singularity-template
 - On Savio: `singularity exec alpine-example.simg sh`
   - `echo $MY_VAR_VALUE`
 
-# Singularity Build Options
-- Install Singularity locally
-- Install Docker locally and use singularity-docker
-  - https://github.com/singularityhub/singularity-docker
-- Build an image on a cloud service or continuous integration host
-  - Sylabs Remote Builder: https://cloud.sylabs.io/builder
-
 # Rewritable/Sandbox Singularity Images
-TODO
+- Can be used for debugging software/images
+- Prefer using a build script for reproducible builds
+
+# Rewritable/Sandbox Demo
+On Savio:
+```bash
+singularity build --sandbox alpine-sandbox docker://alpine
+singularity shell --writable alpine-sandbox
+echo "echo hi" > /bin/hi
+chmod +x /bin/hi
+exit
+singularity build alpine-sandbox.sif alpine-sandbox/
+./alpine-sandbox.sif
+hi
+```
+
+Reference: https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories
 
 # Pushing to Singularity Registry
 TODO
