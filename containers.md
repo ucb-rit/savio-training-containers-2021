@@ -347,6 +347,181 @@ TODO
 
 # Wei's content
 
+# Outline of MPI and GPU Containers 
+
+- MPI (Message Passing Interface) applications can utilize multiple nodes
+- Build and run MPI containers
+  - Single node only
+  - Cross multiple nodes: Rely on the MPI implementation available on the host 
+- MPI library version compatibility on the host and within containers
+
+
+- Build GPU containers from a docker at NGC 
+- Run GPU containers
+- NVIDIA driver and CUDA version compatibility
+
+ 
+# Build MPI singularity containers
+
+- MPI application example: [mpitest.c](samples/mpitest.c) 
+```
+[wfeinstein@n0000 singularity-test]$ cat host 
+n0098.lr6
+n0099.lr6
+
+[wfeinstein@n0000 singularity]$ mpirun -np 4  --hostfile host mpitest
+...
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0099.lr6 rank 2/4
+Hello, I am on n0099.lr6 rank 2/4
+...
+```
+- Definition file  
+[SINGULARITY-mpi3.1.0.def](samples/SINGULARITY-mpi3.1.0.def)
+
+- Build MPI container locally
+```
+sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def
+```
+- Transfer mpi3.1.0.sif to your perferred cluster
+- Check out the container
+```
+[wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif         
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test> ls /opt/
+mpitest  mpitest.c  ompi
+
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test> /opt/ompi/bin/mpirun --version
+mpirun (Open MPI) 3.1.0
+
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test> /opt/ompi/bin/mpirun -np 2 /opt/mpitest
+Hello, I am on n0000.scs00 rank 0/2
+Hello, I am on n0000.scs00 rank 1/2
+``` 
+ 
+# Run MPI containers
+
+- Use MPI libaries soly within a constainer
+- MPI tasks are launched within a container, no dependece on host, however can't expand to multiple nodes
+```
+[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
+Hello, I am on n0000.scs00 rank 0/2
+Hello, I am on n0000.scs00 rank 1/2
+
+[wfeinstein@n0000 singularity-test]$ module list
+No Modulefiles Currently Loaded.
+```
+- Rely on the MPI implementation available on the host
+- Can expand to multple nodes 
+
+```
+[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
+...
+Hello, I am on n0099.lr6 rank 34/64
+Hello, I am on n0098.lr6 rank 27/64
+Hello, I am on n0099.lr6 rank 41/64
+Hello, I am on n0098.lr6 rank 31/64
+...
+[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/9.2.0           2) openmpi-gcc/3.1.0
+```
+
+
+# MPI version compatibility (1)
+
+- Mismatch of MPI libaries on the host and within the container break containers
+- Extra caution to ensure MPI library compatibity
+
+```
+[wfeinstein@n0000 singularity-test]$ ls  *.sif
+mpi2.0.4.sif  mpi3.0.1.sif  mpi3.1.0.sif  mpi4.0.1.sif
+
+[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/9.2.0           2) openmpi/4.0.1-gcc
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 1/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 1/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi2.0.4.sif /opt/mpitest
+--------------------------------------------------------------------------
+It looks like MPI_INIT failed for some reason; your parallel process is
+likely to abort.  There are many reasons that a parallel process can
+....
+```
+
+# MPI version compatibility (2)
+```
+[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/6.3.0           2) openmpi/3.0.1-gcc
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
+Hello, I am on n0098.lr6 rank 1/4
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
+[n0098.lr6:115220] PMIX ERROR: OUT-OF-RESOURCE in file client/pmix_client.c at line 225
+[n0098.lr6:115220] OPAL ERROR: Error in file pmix3x_client.c at line 112
+...
+```
+
+
+# GPU contrainers
+
+- Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution
+- Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
+  - --nv enables NVIDIA GPU support by providing the driver on the host
+- NVIDIA driver not present in the container image itself
+- Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+  - e.g., CUDA/11.2 requires NVIDIA drivr >= R450 
+- Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
+
+
+# GPU container examples
+
+- Build PyTorch GPU container from [PyTorch docker NGC](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)
+```
+docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
+singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3
+```
+- Run PyTorch on a GPU node
+```
+[wfeinstein@n0043 pytorch]$ nvidia-smi -L
+GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152)
+GPU 1: Tesla V100-SXM2-32GB (UUID: GPU-3c41dc39-df54-1582-4d27-6c8454ed96c6)
+
+[wfeinstein@n0043 singularity-test]$ nvidia-smi
+Mon Apr 19 00:32:43 2021       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.44       Driver Version: 440.44       CUDA Version: 10.2     |
+...
+
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c "import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)"
+1.9.0a0+df837d0
+Tesla V100-SXM2-32GB
+11.2
+
+[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif  python -c "import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)"
+1.4.0a0+a5b4d78
+Tesla V100-SXM2-32GB
+10.2
+
+```
+
+
 # Oliver's content
 
 # Other container resources
