@@ -8,80 +8,47 @@
   <meta name="generator" content="pandoc" />
   <meta name="author" content="April 21, 2021" />
   <title>Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows</title>
+  <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
   </style>
   <link rel="stylesheet" type="text/css" media="screen, projection, print"
-    href="https://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
-  <script src="https://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
     charset="utf-8" type="text/javascript"></script>
 </head>
 <body>
@@ -95,7 +62,7 @@ April 21, 2021
 <div id="upcoming-events-and-hiring" class="slide section level1">
 <h1>Upcoming events and hiring</h1>
 <ul>
-<li><p>Looking for researchers working with sensitive data as we are building tools and services to support that work. Get in touch for more information.</p></li>
+<li><p>Research IT is looking for researchers working with sensitive data, as we are building tools and services to support that work. Please email research-it@berkeley.edu for more information.</p></li>
 <li><p>Research IT is hiring graduate and undergraduate students for a variety of positions. Please talk to Amy Neeser to get more information.</p></li>
 <li><p><a href="https://www.meetup.com/ucberkeley_cloudmeetup/">Cloud Computing Meetup</a> (monthly, with next meeting April 29 at 1 pm)</p></li>
 <li><p><a href="https://dlab.berkeley.edu/working-groups/securing-research-data-working-group">Securing Research Data Working Group</a> (monthly, with next meeting May 10 at 2 pm)</p></li>
@@ -103,8 +70,8 @@ April 21, 2021
 </div>
 <div id="introduction" class="slide section level1">
 <h1>Introduction</h1>
-<p>We’ll do this mostly as a demonstration. We encourage you to login to your account and try out the various examples yourself as we go through them.</p>
-<p>The materials for this tutorial are available using git at the short URL (<a href="https://tinyurl.com/brc-apr21">tinyurl.com/brc-apr21</a>), the GitHub URL (<a href="https://github.com/ucb-rit/savio-training-containers-2021">https://github.com/ucb-rit/savio-training-containers-2021</a>), or simply as a <a href="https://github.com/ucb-rit/savio-training-containers-2021/archive/main.zip">zip file</a>.</p>
+<p>We'll do this mostly as a demonstration. We encourage you to login to your account and try out the various examples yourself as we go through them.</p>
+<p>The materials for this tutorial are available using git at the short URL (<a href="https://tinyurl.com/brc-apr21">tinyurl.com/brc-apr21</a>), the GitHub URL (<a href="https://github.com/ucb-rit/savio-training-containers-2021" class="uri">https://github.com/ucb-rit/savio-training-containers-2021</a>), or simply as a <a href="https://github.com/ucb-rit/savio-training-containers-2021/archive/main.zip">zip file</a>.</p>
 </div>
 <div id="outline" class="slide section level1">
 <h1>Outline</h1>
@@ -124,12 +91,12 @@ April 21, 2021
 <li>Sources of images</li>
 </ul></li>
 </ul>
-<p>(need to add outline items for Wei, Oliver, Nicolas sections)</p>
+<p>(Chris will finalize with items for Wei, Oliver, Nicolas sections)</p>
 </div>
 <div id="what-is-a-container" class="slide section level1">
 <h1>What is a container?</h1>
 <ul>
-<li>Containerization provides “lightweight, standalone, executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries and settings”.</li>
+<li>Containerization provides &quot;lightweight, standalone, executable packages of software that include everything needed to run an application: code, runtime, system tools, system libraries and settings&quot;.</li>
 <li>A container provides a self-contained (isolated) filesystem.</li>
 <li>Containers are similar to virtual machines in some ways, but much lighter-weight.</li>
 <li>Containers are portable, shareable, and reproducible.</li>
@@ -138,15 +105,16 @@ April 21, 2021
 <div id="terminologyoverview" class="slide section level1">
 <h1>Terminology/Overview</h1>
 <ul>
-<li>image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
+<li><em>image</em>: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
 <ul>
 <li>may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)</li>
 </ul></li>
-<li>container: a virtual environment based on an image (i.e., a running instance of an image)
+<li><em>container</em>: a virtual environment based on an image (i.e., a running instance of an image)
 <ul>
 <li>software running in the container sees this environment</li>
 </ul></li>
-<li>registry: a source of images</li>
+<li><em>registry</em>: a source of images</li>
+<li><em>host</em>: the actual machine on which the container runs</li>
 </ul>
 </div>
 <div id="terminologyoverview-take-2" class="slide section level1">
@@ -158,7 +126,7 @@ April 21, 2021
 </div>
 <div id="containers-versus-vms" class="slide section level1">
 <h1>Containers versus VMs</h1>
-<p>Let’s see a schematic of what is going on with a container.</p>
+<p>Let's see a schematic of what is going on with a container.</p>
 <center>
 <img src="vm_vs_container.png">
 </center>
@@ -168,20 +136,20 @@ April 21, 2021
 <div id="why-use-containers" class="slide section level1">
 <h1>Why use containers?</h1>
 <ul>
-<li>Portability - install once, run “anywhere”.</li>
-<li>Control your environment/software on systems (such as Savio, XSEDE) you don’t own.</li>
+<li>Portability - install once, run &quot;anywhere&quot;.</li>
+<li>Control your environment/software on systems (such as Savio, XSEDE) you don't own.</li>
 <li>Manage complex dependencies/installations by using containers for modular computational workflows/pipelines, one workflow per container.</li>
 <li>Provide a reproducible environment:
 <ul>
 <li>for yourself in the future,</li>
-<li>for others (lab members),</li>
+<li>for others (e.g., your collaborators),</li>
 <li>for software you develop and want to distribute,</li>
 <li>for a publication.</li>
 </ul></li>
-<li>Flexibility in using various software or application versions:
+<li>Flexibility in using various OS, software, or application versions:
 <ul>
 <li>use outdated or updated versions of software or OS</li>
-<li>use an OS you don’t have.</li>
+<li>use an OS you don't have.</li>
 <li>test your code on various configurations or OSes.</li>
 </ul></li>
 <li>High performance compared to VMs.</li>
@@ -193,15 +161,15 @@ April 21, 2021
 <ul>
 <li>Another level of abstraction/indirection can be confusing
 <ul>
-<li>‘Where’ am I?</li>
+<li>'Where' am I?</li>
 <li>Where are my files?</li>
 </ul></li>
 <li>Can run into host-container incompatibilities (e.g., MPI, GPUs)</li>
 <li>Limitations in going between CPU architectures (e.g., x86_64 versus ARM)</li>
 </ul>
 </div>
-<div id="docker-vs.-singularity" class="slide section level1">
-<h1>Docker vs. Singularity</h1>
+<div id="docker-vs.-singularity-1" class="slide section level1">
+<h1>Docker vs. Singularity (1)</h1>
 <p>What is Docker?</p>
 <ul>
 <li>Open-source computer software that encapsulates an application and all its dependencies into a single image, as a series of layers</li>
@@ -211,15 +179,21 @@ April 21, 2021
 <li>Security concerns make it unsuitable for the HPC environment</li>
 <li>By default you are root in the container</li>
 </ul>
+</div>
+<div id="docker-vs.-singularity-2" class="slide section level1">
+<h1>Docker vs. Singularity (2)</h1>
 <p>What is Singularity?</p>
 <ul>
 <li>Open-source computer software that encapsulates an application and all its dependencies into a single image, as a single file</li>
 <li>Brings containerization to Linux clusters and HPC</li>
 <li>Developed at LBL by Greg Kurtzer</li>
-<li>Typically users have a machine on which they have admin privileges and can’t build images but don’t have admin privileges where the containers are run</li>
+<li>Typically users have a machine on which they have admin privileges and can build images but <em>don't</em> have admin privileges where the containers are run</li>
 <li>You are yourself (from the host machine) in the container</li>
 </ul>
-<p>How can Singularity can leverage Docker?</p>
+</div>
+<div id="docker-vs.-singularity-3" class="slide section level1">
+<h1>Docker vs. Singularity (3)</h1>
+<p>How can Singularity leverage Docker?</p>
 <ul>
 <li>Create and run a Singularity container based on a Docker image</li>
 <li>(transform a Dockerfile?)</li>
@@ -240,18 +214,18 @@ April 21, 2021
 <h1>Running pre-existing containers using Singularity</h1>
 <ul>
 <li>No root/sudo privilege is needed</li>
-<li>Create/download immutable squashfs images/containers</li>
+<li>Download or build immutable squashfs images/containers</li>
 </ul>
 <pre><code>singularity pull --help</code></pre>
 <ul>
-<li>DockerHub: Pull a container from DockerHub.</li>
-</ul>
+<li><p>Pull a container from DockerHub.</p>
 <pre><code>$ singularity pull docker://ubuntu:18.04 
 $ singularity pull docker://rocker/r-base:latest
 $ singularity pull docker://postgres
 $ ls -lrt | tail -n 10   # careful of your quota!
 $ ls -l ~/.singularity
-$ singularity cache list</code></pre>
+$ singularity cache list</code></pre></li>
+</ul>
 <pre><code>singularity run ubuntu_18.04.sif       # use downloaded image file
 ## alternatively, use ~/.singularity/cache
 singularity run docker://ubuntu:18.04  </code></pre>
@@ -262,7 +236,7 @@ pwd
 echo &quot;written from the container&quot; &gt; junk.txt
 ls /global/scratch/paciorek | head -n 5
 exit
-cat junk.txt</code></pre>
+cat /global/scratch/paciorek/junk.txt</code></pre>
 <pre><code>singularity run docker://rocker/r-base    # easy!
 singularity run docker://postgres         # sometimes things are complicated!</code></pre>
 </div>
@@ -273,7 +247,7 @@ singularity run docker://postgres         # sometimes things are complicated!</c
 </ul>
 <pre><code>$ singularity pull hello-world.sif shub://singularityhub/hello-world
 $ singularity run hello-world.sif</code></pre>
-<p>Here’s how one runs a Docker container (on a system where you have admin access):</p>
+<p>Here's how one runs a Docker container (on a system where you have admin access and Docker installed):</p>
 <pre><code>echo $HOME
 docker run -it --rm rocker/r-base bash
 pwd
@@ -282,34 +256,31 @@ ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory<
 <div id="different-ways-of-using-a-singularity-container" class="slide section level1">
 <h1>Different ways of using a Singularity container</h1>
 <ul>
-<li><strong>shell</strong> sub-command: invokes an interactive shell within a container</li>
+<li><p><strong>shell</strong> sub-command: invokes an interactive shell within a container</p>
+<pre><code>singularity shell hello-world.sif</code></pre></li>
+<li><p><strong>run</strong> sub-command: executes the container’s runscript</p>
+<pre><code>singularity run hello-world.sif</code></pre></li>
+<li><p><strong>exec</strong> sub-command: execute an arbitrary command within container</p>
+<pre><code>singularity exec hello-world.sif cat /etc/os-release</code></pre></li>
 </ul>
-<pre><code>singularity shell hello-world.sif</code></pre>
-<ul>
-<li><strong>run</strong> sub-command: executes the container’s runscript</li>
-</ul>
-<pre><code>singularity run hello-world.sif</code></pre>
-<ul>
-<li><strong>exec</strong> sub-command: execute an arbitrary command within container</li>
-</ul>
-<pre><code>singularity exec hello-world.sif cat /etc/os-release</code></pre>
+<p>Let's see what we can find out about this image:</p>
 <pre><code>singularity inspect -r hello-world.sif</code></pre>
 </div>
 <div id="container-processes-on-the-host-system" class="slide section level1">
 <h1>Container processes on the host system</h1>
-<p>Let’s see how the container processes show up from the perspective of the host OS.</p>
-<p>We’ll run some intensive linear algebra in R.</p>
+<p>Let's see how the container processes show up from the perspective of the host OS.</p>
+<p>We'll run some intensive linear algebra in R.</p>
 <pre><code>singularity run docker://rocker/r-base:latest</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">10000</span><span class="sc">^</span><span class="dv">2</span>), <span class="dv">10000</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">chol</span>(<span class="fu">crossprod</span>(a)))</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">10000</span><span class="op">^</span><span class="dv">2</span>), <span class="dv">10000</span>)
+<span class="kw">system.time</span>(<span class="kw">chol</span>(<span class="kw">crossprod</span>(a)))</code></pre></div>
 <p>We see in <code>top</code> that the R process running in the container shows up as an R process on the host.</p>
 </div>
 <div id="accessing-the-savio-filesystems-and-bind-paths" class="slide section level1">
 <h1>Accessing the Savio filesystems and bind paths</h1>
 <ul>
-<li>Singularity allow mapping directories on host to directories within container</li>
-<li>Easy data access within containers</li>
-<li>System-defined bind paths on Savio
+<li>Singularity allows mapping directories on host to directories within container via bind paths</li>
+<li>This enables easy data access within containers</li>
+<li>System-defined (i.e., automatic) bind paths on Savio
 <ul>
 <li><code>/global/home/users/</code></li>
 <li><code>/global/scratch/</code></li>
@@ -333,7 +304,7 @@ ls -l /global/scratch/paciorek/wikistats_small</code></pre>
 <div id="running-containers-on-savio-via-slurm" class="slide section level1">
 <h1>Running containers on Savio via Slurm</h1>
 <p>You can run Singularity within an <code>sbatch</code> or <code>srun</code> session.</p>
-<p>Here’s a basic job script.</p>
+<p>Here's a basic job script.</p>
 <pre><code>#!/bin/bash 
 #SBATCH --job-name=container-test        
 #SBATCH --partition=savio2       
@@ -350,11 +321,11 @@ singularity exec hello-world.sif cat /etc/os-release</code></pre>
 <li><a href="https://cloud.sylabs.io/library">Sylabs container registry</a></li>
 </ul>
 <p>DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG.</p>
-<p>Let’s see an <a href="https://hub.docker.com/u/continuumio">example of the Continuum images</a>.</p>
-<p>(For images provided by Docker, you don’t specify the OWNER.)</p>
+<p>Let's see an <a href="https://hub.docker.com/u/continuumio">example of the Continuum images</a>. Here's a specific example with <a href="https://hub.docker.com/r/continuumio/miniconda3/tags">various tags</a>.</p>
+<p>(For images provided directly by Docker, you don't specify the OWNER.)</p>
 </div>
 <div id="singularity-workflow-leading-into-nicolas-material" class="slide section level1">
-<h1>Singularity workflow (leading into Nicolas’ material)</h1>
+<h1>Singularity workflow (leading into Nicolas' material)</h1>
 <ul>
 <li><a href="https://docs.google.com/document/d/10XAtH9yj5uyiHr3eGHTk9h82bZXEp0aixMCmgYJhGNQ/edit?usp=sharing">install Singularity locally</a> (or build an image in the cloud)</li>
 <li>transfer image to Savio</li>
@@ -362,20 +333,16 @@ singularity exec hello-world.sif cat /etc/os-release</code></pre>
 </ul>
 </div>
 <div id="nicolas-content" class="slide section level1">
-<h1>Nicolas’ content</h1>
+<h1>Nicolas' content</h1>
 </div>
 <div id="approaches-to-building" class="slide section level1">
 <h1>Approaches to Building</h1>
 <ul>
-<li>Build a Docker image and convert
-<ul>
+<li>Build a Docker image and convert</li>
 <li>Convenient if you already have a Docker build file</li>
-</ul></li>
-<li>Build from Singularity definition file
-<ul>
+<li>Build from Singularity definition file</li>
 <li>Bootstrap from another Singularity container or non-Docker base OS</li>
 <li>Alows extra customization with directives</li>
-</ul></li>
 </ul>
 </div>
 <div id="building-a-docker-container" class="slide section level1">
@@ -424,24 +391,18 @@ RUN mkdir -p /app</code></pre>
 <li><code>singularity run alpine-example.simg</code></li>
 <li><code>scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.</code></li>
 <li>On Savio: <code>singularity run alpine-example.simg</code></li>
-<li>On Savio: <code>singularity exec alpine-example.simg sh</code>
-<ul>
+<li>On Savio: <code>singularity exec alpine-example.simg sh</code></li>
 <li><code>echo $MY_VAR_VALUE</code></li>
-</ul></li>
 </ul>
 </div>
 <div id="singularity-build-options" class="slide section level1">
 <h1>Singularity Build Options</h1>
 <ul>
 <li>Install Singularity locally</li>
-<li>Install Docker locally and use singularity-docker
-<ul>
+<li>Install Docker locally and use singularity-docker</li>
 <li>https://github.com/singularityhub/singularity-docker</li>
-</ul></li>
-<li>Build an image on a cloud service or continuous integration host
-<ul>
+<li>Build an image on a cloud service or continuous integration host</li>
 <li>Sylabs Remote Builder: https://cloud.sylabs.io/builder</li>
-</ul></li>
 </ul>
 </div>
 <div id="rewritablesandbox-singularity-images" class="slide section level1">
@@ -453,184 +414,94 @@ RUN mkdir -p /app</code></pre>
 <p>TODO</p>
 </div>
 <div id="weis-content" class="slide section level1">
-<h1>Wei’s content</h1>
+<h1>Wei's content</h1>
 </div>
 <div id="outline-of-mpi-and-gpu-containers" class="slide section level1">
 <h1>Outline of MPI and GPU Containers</h1>
 <ul>
-<li><p>MPI (Message Passing Interface) applications can utilize multiple nodes</p></li>
-<li><p>Build and run MPI containers</p>
-<ul>
+<li>MPI (Message Passing Interface) applications can utilize multiple nodes</li>
+<li>Build and run MPI containers</li>
 <li>Single node only</li>
 <li>Cross multiple nodes: Rely on the MPI implementation available on the host</li>
-</ul></li>
 <li><p>MPI library version compatibility on the host and within containers</p></li>
-<li><p>Build GPU containers from a docker at NGC</p></li>
-<li><p>Run GPU containers</p></li>
+<li>Build GPU containers from a docker at NGC</li>
+<li>Run GPU containers</li>
 <li><p>NVIDIA driver and CUDA version compatibility</p></li>
 </ul>
 </div>
 <div id="build-mpi-singularity-containers" class="slide section level1">
 <h1>Build MPI singularity containers</h1>
 <ul>
-<li>MPI application example: <a href="samples/mpitest.c">mpitest.c</a></li>
+<li>MPI application example: <a href="samples/mpitest.c">mpitest.c</a> ``` [wfeinstein@n0000 singularity-test]$ cat host n0098.lr6 n0099.lr6</li>
 </ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ cat host 
-n0098.lr6
-n0099.lr6
+<p>[wfeinstein@n0000 singularity]$ mpirun -np 4 --hostfile host mpitest ... Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0099.lr6 rank 2/4 Hello, I am on n0099.lr6 rank 2/4 ...</p>
+<pre><code>- Definition file  
+[SINGULARITY-mpi3.1.0.def](samples/SINGULARITY-mpi3.1.0.def)
 
-[wfeinstein@n0000 singularity]$ mpirun -np 4  --hostfile host mpitest
-...
-Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0099.lr6 rank 2/4
-Hello, I am on n0099.lr6 rank 2/4
-...</code></pre>
-<ul>
-<li><p>Definition file<br />
-<a href="samples/SINGULARITY-mpi3.1.0.def">SINGULARITY-mpi3.1.0.def</a></p></li>
-<li><p>Build MPI container locally</p></li>
-</ul>
-<pre><code>sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def</code></pre>
-<ul>
-<li>Transfer mpi3.1.0.sif to your perferred cluster</li>
-<li>Check out the container</li>
-</ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif         
-Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; ls /opt/
-mpitest  mpitest.c  ompi
+- Build MPI container locally</code></pre>
+<p>sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def</p>
+<pre><code>- Transfer mpi3.1.0.sif to your perferred cluster
+- Check out the container</code></pre>
+<p>[wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif<br />
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; ls /opt/ mpitest mpitest.c ompi</p>
+<p>Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun --version mpirun (Open MPI) 3.1.0</p>
+<p>Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun -np 2 /opt/mpitest Hello, I am on n0000.scs00 rank 0/2 Hello, I am on n0000.scs00 rank 1/2</p>
+<pre><code> 
+# Run MPI containers
 
-Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun --version
-mpirun (Open MPI) 3.1.0
-
-Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun -np 2 /opt/mpitest
-Hello, I am on n0000.scs00 rank 0/2
-Hello, I am on n0000.scs00 rank 1/2</code></pre>
-</div>
-<div id="run-mpi-containers" class="slide section level1">
-<h1>Run MPI containers</h1>
-<ul>
-<li>Use MPI libaries soly within a constainer</li>
-<li>MPI tasks are launched within a container, no dependece on host, however can’t expand to multiple nodes</li>
-</ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
-Hello, I am on n0000.scs00 rank 0/2
-Hello, I am on n0000.scs00 rank 1/2
-
-[wfeinstein@n0000 singularity-test]$ module list
-No Modulefiles Currently Loaded.</code></pre>
-<ul>
-<li>Rely on the MPI implementation available on the host</li>
-<li>Can expand to multple nodes</li>
-</ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
-...
-Hello, I am on n0099.lr6 rank 34/64
-Hello, I am on n0098.lr6 rank 27/64
-Hello, I am on n0099.lr6 rank 41/64
-Hello, I am on n0098.lr6 rank 31/64
-...
-[wfeinstein@n0000 singularity-test]$ module list
-Currently Loaded Modulefiles:
-  1) gcc/9.2.0           2) openmpi-gcc/3.1.0</code></pre>
-</div>
-<div id="mpi-version-compatibility-1" class="slide section level1">
-<h1>MPI version compatibility (1)</h1>
-<ul>
-<li>Mismatch of MPI libaries on the host and within the container break containers</li>
-<li>Extra caution to ensure MPI library compatibity</li>
-</ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ ls  *.sif
-mpi2.0.4.sif  mpi3.0.1.sif  mpi3.1.0.sif  mpi4.0.1.sif
-
-[wfeinstein@n0000 singularity-test]$ module list
-Currently Loaded Modulefiles:
-  1) gcc/9.2.0           2) openmpi/4.0.1-gcc
-
-[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
-Hello, I am on n0098.lr6 rank 2/4
-Hello, I am on n0098.lr6 rank 1/4
-Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 0/4
-
-[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
-Hello, I am on n0098.lr6 rank 2/4
-Hello, I am on n0098.lr6 rank 1/4
-Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 0/4
-
-[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi2.0.4.sif /opt/mpitest
---------------------------------------------------------------------------
-It looks like MPI_INIT failed for some reason; your parallel process is
-likely to abort.  There are many reasons that a parallel process can
-....</code></pre>
-</div>
-<div id="mpi-version-compatibility-2" class="slide section level1">
-<h1>MPI version compatibility (2)</h1>
-<pre><code>[wfeinstein@n0000 singularity-test]$ module list
-Currently Loaded Modulefiles:
-  1) gcc/6.3.0           2) openmpi/3.0.1-gcc
-
-[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
-Hello, I am on n0098.lr6 rank 2/4
-Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 0/4
-Hello, I am on n0098.lr6 rank 1/4
-
-[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
-[n0098.lr6:115220] PMIX ERROR: OUT-OF-RESOURCE in file client/pmix_client.c at line 225
-[n0098.lr6:115220] OPAL ERROR: Error in file pmix3x_client.c at line 112
-...</code></pre>
-</div>
-<div id="gpu-contrainers" class="slide section level1">
-<h1>GPU contrainers</h1>
-<ul>
-<li>Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution</li>
-<li>Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
-<ul>
-<li>–nv enables NVIDIA GPU support by providing the driver on the host</li>
-</ul></li>
-<li>NVIDIA driver not present in the container image itself</li>
-<li>Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
-<ul>
-<li>e.g., CUDA/11.2 requires NVIDIA drivr &gt;= R450</li>
-</ul></li>
-<li>Host driver version requirements are detailed in <a href="https://docs.nvidia.com/deploy/cuda-compatibility/index.html">NGC documentation</a></li>
-</ul>
-</div>
-<div id="gpu-container-examples" class="slide section level1">
-<h1>GPU container examples</h1>
-<ul>
-<li>Build PyTorch GPU container from <a href="https://ngc.nvidia.com/catalog/containers/nvidia:pytorch">PyTorch docker NGC</a></li>
-</ul>
-<pre><code>docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
-singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</code></pre>
-<ul>
-<li>Run PyTorch on a GPU node</li>
-</ul>
-<pre><code>[wfeinstein@n0043 pytorch]$ nvidia-smi -L
-GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152)
-GPU 1: Tesla V100-SXM2-32GB (UUID: GPU-3c41dc39-df54-1582-4d27-6c8454ed96c6)
-
-[wfeinstein@n0043 singularity-test]$ nvidia-smi
-Mon Apr 19 00:32:43 2021       
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 440.44       Driver Version: 440.44       CUDA Version: 10.2     |
-...
-
-[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
-1.9.0a0+df837d0
-Tesla V100-SXM2-32GB
-11.2
-
-[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif  python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
-1.4.0a0+a5b4d78
-Tesla V100-SXM2-32GB
-10.2
+- Use MPI libaries soly within a constainer
+- MPI tasks are launched within a container, no dependece on host, however can&#39;t expand to multiple nodes</code></pre>
+<p>[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif /opt/ompi/bin/mpirun -np 2 /opt/mpitest Hello, I am on n0000.scs00 rank 0/2 Hello, I am on n0000.scs00 rank 1/2</p>
+<p>[wfeinstein@n0000 singularity-test]$ module list No Modulefiles Currently Loaded.</p>
+<pre><code>- Rely on the MPI implementation available on the host
+- Can expand to multple nodes 
 </code></pre>
+<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest ... Hello, I am on n0099.lr6 rank 34/64 Hello, I am on n0098.lr6 rank 27/64 Hello, I am on n0099.lr6 rank 41/64 Hello, I am on n0098.lr6 rank 31/64 ... [wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/9.2.0 2) openmpi-gcc/3.1.0</p>
+<pre><code>
+
+# MPI version compatibility (1)
+
+- Mismatch of MPI libaries on the host and within the container break containers
+- Extra caution to ensure MPI library compatibity
+</code></pre>
+<p>[wfeinstein@n0000 singularity-test]$ ls *.sif mpi2.0.4.sif mpi3.0.1.sif mpi3.1.0.sif mpi4.0.1.sif</p>
+<p>[wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/9.2.0 2) openmpi/4.0.1-gcc</p>
+<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 1/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4</p>
+<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 1/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4</p>
+<h2 id="wfeinsteinn0000-singularity-test-mpirun--np-4---hostfile-host-singularity-exec-mpi2.0.4.sif-optmpitest">[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi2.0.4.sif /opt/mpitest</h2>
+<p>It looks like MPI_INIT failed for some reason; your parallel process is likely to abort. There are many reasons that a parallel process can ....</p>
+<pre><code>
+# MPI version compatibility (2)</code></pre>
+<p>[wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/6.3.0 2) openmpi/3.0.1-gcc</p>
+<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4 Hello, I am on n0098.lr6 rank 1/4</p>
+<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest [n0098.lr6:115220] PMIX ERROR: OUT-OF-RESOURCE in file client/pmix_client.c at line 225 [n0098.lr6:115220] OPAL ERROR: Error in file pmix3x_client.c at line 112 ...</p>
+<pre><code>
+
+# GPU contrainers
+
+- Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution
+- Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
+  - --nv enables NVIDIA GPU support by providing the driver on the host
+- NVIDIA driver not present in the container image itself
+- Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+  - e.g., CUDA/11.2 requires NVIDIA drivr &gt;= R450 
+- Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
+
+
+# GPU container examples
+
+- Build PyTorch GPU container from [PyTorch docker NGC](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)</code></pre>
+<p>docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3 singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</p>
+<pre><code>- Run PyTorch on a GPU node</code></pre>
+<p>[wfeinstein@n0043 pytorch]$ nvidia-smi -L GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152) GPU 1: Tesla V100-SXM2-32GB (UUID: GPU-3c41dc39-df54-1582-4d27-6c8454ed96c6)</p>
+<p>[wfeinstein@n0043 singularity-test]$ nvidia-smi Mon Apr 19 00:32:43 2021<br />
++-----------------------------------------------------------------------------+ | NVIDIA-SMI 440.44 Driver Version: 440.44 CUDA Version: 10.2 | ...</p>
+<p>[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c &quot;import torch; print(torch.<strong>version</strong>);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot; 1.9.0a0+df837d0 Tesla V100-SXM2-32GB 11.2</p>
+<p>[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif python -c &quot;import torch; print(torch.<strong>version</strong>);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot; 1.4.0a0+a5b4d78 Tesla V100-SXM2-32GB 10.2</p>
+<p>```</p>
 </div>
 <div id="olivers-content" class="slide section level1">
-<h1>Oliver’s content</h1>
+<h1>Oliver's content</h1>
 </div>
 <div id="other-container-resources" class="slide section level1">
 <h1>Other container resources</h1>
@@ -647,7 +518,7 @@ Tesla V100-SXM2-32GB
 <ul>
 <li>Check the Status and Announcements page:
 <ul>
-<li><a href="https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements">https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements</a></li>
+<li><a href="https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements" class="uri">https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements</a></li>
 </ul></li>
 <li>For technical issues and questions about using Savio:
 <ul>

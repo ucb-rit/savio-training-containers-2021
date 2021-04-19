@@ -4,7 +4,7 @@
 
 # Upcoming events and hiring
 
- - Looking for researchers working with sensitive data as we are building tools and services to support that work. Get in touch for more information.
+ - Research IT is looking for researchers working with sensitive data, as we are building tools and services to support that work. Please email research-it@berkeley.edu for more information.
 
  - Research IT is hiring graduate and undergraduate students for a variety of positions. Please talk to Amy Neeser to get more information.
 
@@ -24,17 +24,17 @@ The materials for this tutorial are available using git at the short URL ([tinyu
 
 This training session will cover the following topics:
 
-- Introduction to containers
-   - Comparison with VMs
-   - Docker and Singularity
-   - Advantages of containers
-- Basic usage of containers
-   - Demo of running a Singularity container
-   - More details on running a container
-   - Use with Slurm
-   - Sources of images
+ - Introduction to containers
+    - Comparison with VMs
+    - Docker and Singularity
+    - Advantages of containers
+ - Basic usage of containers
+    - Demo of running a Singularity container
+    - More details on running a container
+    - Use with Slurm
+    - Sources of images
 
-(need to add outline items for Wei, Oliver, Nicolas sections)
+(Chris will finalize with items for Wei, Oliver, Nicolas sections)
 
 # What is a container?
 
@@ -45,11 +45,12 @@ This training session will cover the following topics:
 
 # Terminology/Overview
 
- - image: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
+ - *image*: a bundle of files, including the operating system, system libraries, software, and possibly data and files associated with the software
     - may be stored as a single file (e.g., Singularity) or a group of files (e.g., Docker)
- - container: a virtual environment based on an image (i.e., a running instance of an image)
+ - *container*: a virtual environment based on an image (i.e., a running instance of an image)
     - software running in the container sees this environment
- - registry: a source of images
+ - *registry*: a source of images
+ - *host*: the actual machine on which the container runs
 
 # Terminology/Overview, take 2
 
@@ -74,10 +75,10 @@ VMs have a copy of the entire operating system and need to be booted up, while c
  - Manage complex dependencies/installations by using containers for modular computational workflows/pipelines, one workflow per container.
  - Provide a reproducible environment:
      - for yourself in the future,
-     - for others (lab members),
+     - for others (e.g., your collaborators),
      - for software you develop and want to distribute,
      - for a publication.
- - Flexibility in using various software or application versions:
+ - Flexibility in using various OS, software, or application versions:
      - use outdated or updated versions of software or OS
      - use an OS you don't have.
      - test your code on various configurations or OSes.
@@ -93,7 +94,7 @@ Much of this comes down to the fact that your workflow can depend in a fragile w
  - Can run into host-container incompatibilities (e.g., MPI, GPUs)
  - Limitations in going between CPU architectures (e.g., x86_64 versus ARM)
 
-# Docker vs. Singularity
+# Docker vs. Singularity (1)
 
 What is Docker?
 
@@ -104,15 +105,19 @@ What is Docker?
 - Security concerns make it unsuitable for the HPC environment
 - By default you are root in the container
 
+# Docker vs. Singularity (2)
+
 What is Singularity?
 
 - Open-source computer software that encapsulates an application and all its dependencies into a single image, as a single file
 - Brings containerization to Linux clusters and HPC
 - Developed at LBL by Greg Kurtzer
-- Typically users have a machine on which they have admin privileges and can't build images but don't have admin privileges where the containers are run
+- Typically users have a machine on which they have admin privileges and can build images but *don't* have admin privileges where the containers are run
 - You are yourself (from the host machine) in the container
 
-How can Singularity can leverage Docker?
+# Docker vs. Singularity (3)
+
+How can Singularity leverage Docker?
 
 - Create and run a Singularity container based on a Docker image
 - (transform a Dockerfile?)
@@ -129,13 +134,13 @@ How can Singularity can leverage Docker?
 # Running pre-existing containers using Singularity
 
 - No root/sudo privilege is needed
-- Create/download immutable squashfs images/containers
+- Download or build immutable squashfs images/containers
 
 ```
 singularity pull --help
 ```
 
-- DockerHub: Pull a container from DockerHub.
+- Pull a container from DockerHub.
 ```
 $ singularity pull docker://ubuntu:18.04 
 $ singularity pull docker://rocker/r-base:latest
@@ -160,7 +165,7 @@ pwd
 echo "written from the container" > junk.txt
 ls /global/scratch/paciorek | head -n 5
 exit
-cat junk.txt
+cat /global/scratch/paciorek/junk.txt
 ```
 
 ```
@@ -177,7 +182,7 @@ $ singularity pull hello-world.sif shub://singularityhub/hello-world
 $ singularity run hello-world.sif
 ```
 
-Here's how one runs a Docker container (on a system where you have admin access):
+Here's how one runs a Docker container (on a system where you have admin access and Docker installed):
 
 ```
 echo $HOME
@@ -202,6 +207,8 @@ singularity run hello-world.sif
 singularity exec hello-world.sif cat /etc/os-release
 ```
 
+Let's see what we can find out about this image:
+
 ```
 singularity inspect -r hello-world.sif
 ```
@@ -225,9 +232,9 @@ We see in `top` that the R process running in the container shows up as an R pro
 
 # Accessing the Savio filesystems and bind paths
 
- - Singularity allow mapping directories on host to directories within container
- - Easy data access within containers
- - System-defined bind paths on Savio
+ - Singularity allows mapping directories on host to directories within container via bind paths
+ - This enables easy data access within containers
+ - System-defined (i.e., automatic) bind paths on Savio
      - `/global/home/users/`
      - `/global/scratch/`
      - `/tmp`
@@ -272,9 +279,9 @@ singularity exec hello-world.sif cat /etc/os-release
 
 DockerHub images are named liked this: OWNER/CONTAINERNAME:TAG.
 
-Let's see an [example of the Continuum images](https://hub.docker.com/u/continuumio).
+Let's see an [example of the Continuum images](https://hub.docker.com/u/continuumio). Here's a specific example with [various tags](https://hub.docker.com/r/continuumio/miniconda3/tags).
 
-(For images provided by Docker, you don't specify the OWNER.)
+(For images provided directly by Docker, you don't specify the OWNER.)
 
 
 # Singularity workflow (leading into Nicolas' material)
