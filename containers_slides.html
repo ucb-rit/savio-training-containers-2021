@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="author" content="April 21, 2021" />
-  <title>Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows</title>
+  <title>Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows (tinyurl.com/brc-apr21)</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 div.sourceCode { overflow-x: auto; }
@@ -53,7 +53,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 <body>
 <div class="slide titlepage">
-  <h1 class="title">Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows</h1>
+  <h1 class="title">Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows (tinyurl.com/brc-apr21)</h1>
   <p class="author">
 April 21, 2021
   </p>
@@ -77,21 +77,32 @@ April 21, 2021
 <h1>Outline</h1>
 <p>This training session will cover the following topics:</p>
 <ul>
-<li>Introduction to containers
+<li>Introduction to containers (Chris)
 <ul>
 <li>Comparison with VMs</li>
 <li>Docker and Singularity</li>
 <li>Advantages of containers</li>
 </ul></li>
-<li>Basic usage of containers
+<li>Basic usage of containers (Chris)
 <ul>
 <li>Demo of running a Singularity container</li>
 <li>More details on running a container</li>
 <li>Use with Slurm</li>
 <li>Sources of images</li>
 </ul></li>
+<li>Building containers (Nicolas)
+<ul>
+<li>Various ways to build Singularity containers</li>
+<li>Using definition files</li>
+<li>Using registries</li>
+<li>Rewritable/sandbox images</li>
+</ul></li>
+<li>Specialized uses (Wei)
+<ul>
+<li>MPI</li>
+<li>GPUs</li>
+</ul></li>
 </ul>
-<p>(Chris will finalize with items for Wei, Oliver, Nicolas sections)</p>
 </div>
 <div id="what-is-a-container" class="slide section level1">
 <h1>What is a container?</h1>
@@ -195,10 +206,12 @@ April 21, 2021
 <h1>Docker vs. Singularity (3)</h1>
 <p>How can Singularity leverage Docker?</p>
 <ul>
-<li>Create and run a Singularity container based on a Docker image</li>
-<li>(transform a Dockerfile?)</li>
+<li>Create and run a Singularity container based on a Docker image
+<ul>
+<li>From DockerHub</li>
+<li>By archiving a Docker image (and transferring to Savio)</li>
+</ul></li>
 <li>Create Singularity images by running Singularity in a Docker container</li>
-<li>other?</li>
 </ul>
 </div>
 <div id="examples-of-where-containers-are-used" class="slide section level1">
@@ -216,61 +229,62 @@ April 21, 2021
 <li>No root/sudo privilege is needed</li>
 <li>Download or build immutable squashfs images/containers</li>
 </ul>
-<pre><code>singularity pull --help</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> pull --help</code></pre></div>
 <ul>
 <li><p>Pull a container from DockerHub.</p>
-<pre><code>$ singularity pull docker://ubuntu:18.04 
-$ singularity pull docker://rocker/r-base:latest
-$ singularity pull docker://postgres
-$ ls -lrt | tail -n 10   # careful of your quota!
-$ ls -l ~/.singularity
-$ singularity cache list</code></pre></li>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> pull docker://ubuntu:18.04 
+<span class="ex">singularity</span> pull docker://rocker/r-base:latest
+<span class="ex">singularity</span> pull docker://postgres
+<span class="fu">ls</span> -lrt <span class="kw">|</span> <span class="fu">tail</span> -n 10   # careful of your quota!
+<span class="fu">ls</span> -l ~/.singularity
+<span class="ex">singularity</span> cache list</code></pre></div></li>
+<li><p>Now run the container</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run ubuntu_18.04.sif       # use downloaded image file
+<span class="co">## alternatively, use ~/.singularity/cache</span>
+<span class="ex">singularity</span> run docker://ubuntu:18.04  </code></pre></div></li>
 </ul>
-<pre><code>singularity run ubuntu_18.04.sif       # use downloaded image file
-## alternatively, use ~/.singularity/cache
-singularity run docker://ubuntu:18.04  </code></pre>
 <p>Note the change in prompt.</p>
-<pre><code>cat /etc/issue   # not the Savio OS!
-which python     # not much here!
-pwd
-echo &quot;written from the container&quot; &gt; junk.txt
-ls /global/scratch/paciorek | head -n 5
-exit
-cat /global/scratch/paciorek/junk.txt</code></pre>
-<pre><code>singularity run docker://rocker/r-base    # easy!
-singularity run docker://postgres         # sometimes things are complicated!</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">cat</span> /etc/issue   # not the Savio OS!
+<span class="fu">which</span> python     # not much here!
+<span class="bu">pwd</span>
+<span class="bu">echo</span> <span class="st">&quot;written from the container&quot;</span> <span class="op">&gt;</span> junk.txt
+<span class="fu">ls</span> /global/scratch/paciorek <span class="kw">|</span> <span class="fu">head</span> -n 5
+<span class="bu">exit</span>
+<span class="fu">cat</span> /global/scratch/paciorek/junk.txt</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run docker://rocker/r-base    # easy!
+<span class="ex">singularity</span> run docker://postgres         # sometimes things are complicated!</code></pre></div>
 </div>
 <div id="other-ways-of-running-a-container" class="slide section level1">
 <h1>Other ways of running a container</h1>
 <ul>
 <li>Singularity Hub: If no tag is specified, the master branch of the repository is used</li>
 </ul>
-<pre><code>$ singularity pull hello-world.sif shub://singularityhub/hello-world
-$ singularity run hello-world.sif</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">singularity</span> pull hello-world.sif shub://singularityhub/hello-world
+$ <span class="ex">singularity</span> run hello-world.sif</code></pre></div>
 <p>Here's how one runs a Docker container (on a system where you have admin access and Docker installed):</p>
-<pre><code>echo $HOME
-docker run -it --rm rocker/r-base bash
-pwd
-ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">echo</span> <span class="va">$HOME</span>
+<span class="ex">docker</span> run -it --rm rocker/r-base bash
+<span class="bu">pwd</span>
+<span class="fu">ls</span> /accounts/gen/vis/paciorek    # no automatic mount of my host home directory</code></pre></div>
 </div>
 <div id="different-ways-of-using-a-singularity-container" class="slide section level1">
 <h1>Different ways of using a Singularity container</h1>
 <ul>
 <li><p><strong>shell</strong> sub-command: invokes an interactive shell within a container</p>
-<pre><code>singularity shell hello-world.sif</code></pre></li>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> shell hello-world.sif</code></pre></div></li>
 <li><p><strong>run</strong> sub-command: executes the container’s runscript</p>
-<pre><code>singularity run hello-world.sif</code></pre></li>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run hello-world.sif</code></pre></div></li>
 <li><p><strong>exec</strong> sub-command: execute an arbitrary command within container</p>
-<pre><code>singularity exec hello-world.sif cat /etc/os-release</code></pre></li>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> exec hello-world.sif cat /etc/os-release</code></pre></div></li>
 </ul>
 <p>Let's see what we can find out about this image:</p>
-<pre><code>singularity inspect -r hello-world.sif</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> inspect -r hello-world.sif</code></pre></div>
 </div>
 <div id="container-processes-on-the-host-system" class="slide section level1">
 <h1>Container processes on the host system</h1>
 <p>Let's see how the container processes show up from the perspective of the host OS.</p>
 <p>We'll run some intensive linear algebra in R.</p>
-<pre><code>singularity run docker://rocker/r-base:latest</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run docker://rocker/r-base:latest</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">10000</span><span class="op">^</span><span class="dv">2</span>), <span class="dv">10000</span>)
 <span class="kw">system.time</span>(<span class="kw">chol</span>(<span class="kw">crossprod</span>(a)))</code></pre></div>
 <p>We see in <code>top</code> that the R process running in the container shows up as an R process on the host.</p>
@@ -292,26 +306,26 @@ ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory<
 <li><code>-B /host/path/:/container/path</code></li>
 </ul></li>
 </ul>
-<pre><code>ls /global/scratch/paciorek/wikistats_small
-singularity shell -B /global/scratch/paciorek/wikistats_small:/data hello-world.sif
-ls /data
-touch /data/erase-me
-exit
-ls -l /global/scratch/paciorek/wikistats_small</code></pre>
-<p>In general one would do I/O to data on the host system rather than writing into the container.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">ls</span> /global/scratch/paciorek/wikistats_small
+<span class="ex">singularity</span> shell -B /global/scratch/paciorek/wikistats_small:/data hello-world.sif
+<span class="fu">ls</span> /data
+<span class="fu">touch</span> /data/erase-me
+<span class="bu">exit</span>
+<span class="fu">ls</span> -l /global/scratch/paciorek/wikistats_small</code></pre></div>
+<p>In general one would do I/O to files on the host system rather than writing into the container.</p>
 <p>It is possible to create writeable containers.</p>
 </div>
 <div id="running-containers-on-savio-via-slurm" class="slide section level1">
 <h1>Running containers on Savio via Slurm</h1>
 <p>You can run Singularity within an <code>sbatch</code> or <code>srun</code> session.</p>
 <p>Here's a basic job script.</p>
-<pre><code>#!/bin/bash 
-#SBATCH --job-name=container-test        
-#SBATCH --partition=savio2       
-#SBATCH --account=co_stat                   
-#SBATCH --time=5:00     
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash </span>
+<span class="co">#SBATCH --job-name=container-test        </span>
+<span class="co">#SBATCH --partition=savio2       </span>
+<span class="co">#SBATCH --account=co_stat                   </span>
+<span class="co">#SBATCH --time=5:00     </span>
 
-singularity exec hello-world.sif cat /etc/os-release</code></pre>
+<span class="ex">singularity</span> exec hello-world.sif cat /etc/os-release</code></pre></div>
 </div>
 <div id="sources-of-container-images-registries" class="slide section level1">
 <h1>Sources of container images (registries)</h1>
@@ -324,46 +338,81 @@ singularity exec hello-world.sif cat /etc/os-release</code></pre>
 <p>Let's see an <a href="https://hub.docker.com/u/continuumio">example of the Continuum images</a>. Here's a specific example with <a href="https://hub.docker.com/r/continuumio/miniconda3/tags">various tags</a>.</p>
 <p>(For images provided directly by Docker, you don't specify the OWNER.)</p>
 </div>
-<div id="singularity-workflow-leading-into-nicolas-material" class="slide section level1">
-<h1>Singularity workflow (leading into Nicolas' material)</h1>
-<ul>
-<li><a href="https://docs.google.com/document/d/10XAtH9yj5uyiHr3eGHTk9h82bZXEp0aixMCmgYJhGNQ/edit?usp=sharing">install Singularity locally</a> (or build an image in the cloud)</li>
-<li>transfer image to Savio</li>
-<li>run container on Savio</li>
-</ul>
-</div>
-<div id="nicolas-content" class="slide section level1">
-<h1>Nicolas' content</h1>
-</div>
 <div id="approaches-to-building" class="slide section level1">
 <h1>Approaches to Building</h1>
 <ul>
-<li>Build a Docker image and convert</li>
+<li>Build a Docker image and convert
+<ul>
 <li>Convenient if you already have a Docker build file</li>
-<li>Build from Singularity definition file</li>
+</ul></li>
+<li>Build from Singularity definition file
+<ul>
 <li>Bootstrap from another Singularity container or non-Docker base OS</li>
 <li>Alows extra customization with directives</li>
+</ul></li>
 </ul>
 </div>
 <div id="building-a-docker-container" class="slide section level1">
 <h1>Building a Docker container</h1>
-<pre class="docker"><code>FROM ubuntu:18.04
-RUN mkdir -p /app</code></pre>
-<ul>
-<li>TODO: cover ENTRYPOINT and CMD</li>
-</ul>
+<pre class="docker"><code>FROM centos:7
+RUN yum install -y epel-release &amp;&amp; yum install -y cowsay
+ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
+<p>See <code>cowsay-entrypoint</code> and <code>cowsay-cmd</code> in this repository.</p>
+<p>Build the container:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> build -t ghcr.io/nicolaschan/cowsay-entrypoint:latest -f cowsay-entrypoint .
+<span class="ex">docker</span> build -t ghcr.io/nicolaschan/cowsay-cmd:latest -f cowsay-cmd .</code></pre></div>
+</div>
+<div id="running-docker-container" class="slide section level1">
+<h1>Running Docker container</h1>
+<p>ENTRYPOINT Docker container:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run ghcr.io/nicolaschan/cowsay-entrypoint hi</code></pre></div>
+<p>CMD Docker container (the following do the same thing):</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run ghcr.io/nicolaschan/cowsay-cmd
+<span class="ex">docker</span> run ghcr.io/nicolaschan/cowsay-cmd cowsay hi</code></pre></div>
 </div>
 <div id="pushing-to-docker-registry" class="slide section level1">
 <h1>Pushing to Docker Registry</h1>
-<p>TODO</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># use docker login to login according to the registry you are using</span>
+<span class="ex">docker</span> push ghcr.io/nicolaschan/cowsay-entrypoint:latest
+<span class="ex">docker</span> push ghcr.io/nicolaschan/cowsay-cmd:latest</code></pre></div>
+<p>You can use the Docker container registry of your choice or deploy your own registry: <a href="https://docs.docker.com/registry/deploying/" class="uri">https://docs.docker.com/registry/deploying/</a></p>
 </div>
 <div id="converting-docker-to-singularity" class="slide section level1">
 <h1>Converting Docker to Singularity</h1>
 <ul>
-<li><code>singularity run docker://...</code></li>
-<li><code>singularity build test.simg docker://</code></li>
+<li><code>singularity run docker://ghcr.io/nicolaschan/cowsay-entrypoint hi</code></li>
+<li><code>singularity build cowsay.simg docker://ghcr.io/nicolaschan/cowsay-entrypoint</code></li>
 </ul>
-<p>Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md</p>
+<p>Reference: <a href="https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md" class="uri">https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md</a></p>
+</div>
+<div id="singularity-build-strategies" class="slide section level1">
+<h1>Singularity Build Strategies</h1>
+<ul>
+<li>Install Singularity locally (demo today)
+<ul>
+<li>Requires root access on your system</li>
+</ul></li>
+<li>Install Docker locally and use singularity-docker
+<ul>
+<li>https://github.com/singularityhub/singularity-docker</li>
+</ul></li>
+<li>Build an image on a cloud service or continuous integration host
+<ul>
+<li>Sylabs Remote Builder: https://cloud.sylabs.io/builder</li>
+</ul></li>
+</ul>
+</div>
+<div id="suggestionspitfalls" class="slide section level1">
+<h1>Suggestions/Pitfalls</h1>
+<ul>
+<li>Match CPU architecture of host where image is built and Savio</li>
+<li>Savio is x86_64</li>
+<li>Savio will try to bind mount the following paths by default (from <code>/etc/singularity/singularity.conf</code>):</li>
+</ul>
+<pre><code>bind path = /etc/localtime
+bind path = /etc/hosts
+bind path = /global/scratch
+bind path = /global/home/users</code></pre>
 </div>
 <div id="singularity-definition-file" class="slide section level1">
 <h1>Singularity Definition File</h1>
@@ -376,7 +425,7 @@ RUN mkdir -p /app</code></pre>
 <div id="singularity-build-example" class="slide section level1">
 <h1>Singularity Build Example</h1>
 <ul>
-<li>Building simple archlinux asciiquarium image: <code>arch-example.def</code></li>
+<li>Building simple alpine asciiquarium image: <code>alpine-example.def</code></li>
 <li><code>%setup</code>: Executed on host system before container is built</li>
 <li><code>%environment</code>: Set environment variables in the container</li>
 <li><code>%post</code>: Executed within the container at build time</li>
@@ -391,38 +440,45 @@ RUN mkdir -p /app</code></pre>
 <li><code>singularity run alpine-example.simg</code></li>
 <li><code>scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.</code></li>
 <li>On Savio: <code>singularity run alpine-example.simg</code></li>
-<li>On Savio: <code>singularity exec alpine-example.simg sh</code></li>
-<li><code>echo $MY_VAR_VALUE</code></li>
-</ul>
-</div>
-<div id="singularity-build-options" class="slide section level1">
-<h1>Singularity Build Options</h1>
+<li>On Savio: <code>singularity exec alpine-example.simg sh</code>
 <ul>
-<li>Install Singularity locally</li>
-<li>Install Docker locally and use singularity-docker</li>
-<li>https://github.com/singularityhub/singularity-docker</li>
-<li>Build an image on a cloud service or continuous integration host</li>
-<li>Sylabs Remote Builder: https://cloud.sylabs.io/builder</li>
+<li><code>echo $MY_VAR_VALUE</code></li>
+</ul></li>
 </ul>
 </div>
 <div id="rewritablesandbox-singularity-images" class="slide section level1">
 <h1>Rewritable/Sandbox Singularity Images</h1>
-<p>TODO</p>
+<ul>
+<li>Can be used for debugging software/images</li>
+<li>Prefer using a build script for reproducible builds</li>
+</ul>
+</div>
+<div id="rewritablesandbox-demo" class="slide section level1">
+<h1>Rewritable/Sandbox Demo</h1>
+<p>On Savio:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> build --sandbox alpine-sandbox docker://alpine
+<span class="ex">singularity</span> shell --writable alpine-sandbox
+<span class="bu">echo</span> <span class="st">&quot;echo hi&quot;</span> <span class="op">&gt;</span> /bin/hi
+<span class="fu">chmod</span> +x /bin/hi
+<span class="bu">exit</span>
+<span class="ex">singularity</span> build alpine-sandbox.sif alpine-sandbox/
+<span class="ex">./alpine-sandbox.sif</span>
+<span class="ex">hi</span></code></pre></div>
+<p>Reference: https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories</p>
 </div>
 <div id="pushing-to-singularity-registry" class="slide section level1">
 <h1>Pushing to Singularity Registry</h1>
-<p>TODO</p>
-</div>
-<div id="weis-content" class="slide section level1">
-<h1>Wei's content</h1>
+<p>Similar to Docker registry, you can use the Singularity registry of your choice. This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work). For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html</p>
 </div>
 <div id="outline-of-mpi-and-gpu-containers" class="slide section level1">
 <h1>Outline of MPI and GPU Containers</h1>
 <ul>
 <li>MPI (Message Passing Interface) applications can utilize multiple nodes</li>
-<li>Build and run MPI containers</li>
+<li>Build and run MPI containers
+<ul>
 <li>Single node only</li>
 <li>Cross multiple nodes: Rely on the MPI implementation available on the host</li>
+</ul></li>
 <li><p>MPI library version compatibility on the host and within containers</p></li>
 <li>Build GPU containers from a docker at NGC</li>
 <li>Run GPU containers</li>
@@ -432,73 +488,158 @@ RUN mkdir -p /app</code></pre>
 <div id="build-mpi-singularity-containers" class="slide section level1">
 <h1>Build MPI singularity containers</h1>
 <ul>
-<li>MPI application example: <a href="samples/mpitest.c">mpitest.c</a> ``` [wfeinstein@n0000 singularity-test]$ cat host n0098.lr6 n0099.lr6</li>
+<li>MPI application example: <a href="samples/mpitest.c">mpitest.c</a></li>
 </ul>
-<p>[wfeinstein@n0000 singularity]$ mpirun -np 4 --hostfile host mpitest ... Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0099.lr6 rank 2/4 Hello, I am on n0099.lr6 rank 2/4 ...</p>
-<pre><code>- Definition file  
-[SINGULARITY-mpi3.1.0.def](samples/SINGULARITY-mpi3.1.0.def)
+<pre><code>[wfeinstein@n0000 singularity-test]$ cat host 
+n0098.lr6
+n0099.lr6
 
-- Build MPI container locally</code></pre>
-<p>sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def</p>
-<pre><code>- Transfer mpi3.1.0.sif to your perferred cluster
-- Check out the container</code></pre>
-<p>[wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif<br />
-Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; ls /opt/ mpitest mpitest.c ompi</p>
-<p>Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun --version mpirun (Open MPI) 3.1.0</p>
-<p>Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun -np 2 /opt/mpitest Hello, I am on n0000.scs00 rank 0/2 Hello, I am on n0000.scs00 rank 1/2</p>
-<pre><code> 
-# Run MPI containers
+[wfeinstein@n0000 singularity]$ mpirun -np 4  --hostfile host mpitest
+...
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0099.lr6 rank 2/4
+Hello, I am on n0099.lr6 rank 2/4
+...</code></pre>
+<ul>
+<li><p>Definition file<br />
+<a href="samples/SINGULARITY-mpi3.1.0.def">SINGULARITY-mpi3.1.0.def</a></p></li>
+<li><p>Build MPI container locally</p>
+<pre><code>sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def</code></pre></li>
+<li>Transfer mpi3.1.0.sif to your preferred cluster</li>
+<li><p>Check out the container</p></li>
+</ul>
+<pre><code>[wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif         
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; ls /opt/
+mpitest  mpitest.c  ompi
 
-- Use MPI libaries soly within a constainer
-- MPI tasks are launched within a container, no dependece on host, however can&#39;t expand to multiple nodes</code></pre>
-<p>[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif /opt/ompi/bin/mpirun -np 2 /opt/mpitest Hello, I am on n0000.scs00 rank 0/2 Hello, I am on n0000.scs00 rank 1/2</p>
-<p>[wfeinstein@n0000 singularity-test]$ module list No Modulefiles Currently Loaded.</p>
-<pre><code>- Rely on the MPI implementation available on the host
-- Can expand to multple nodes 
-</code></pre>
-<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest ... Hello, I am on n0099.lr6 rank 34/64 Hello, I am on n0098.lr6 rank 27/64 Hello, I am on n0099.lr6 rank 41/64 Hello, I am on n0098.lr6 rank 31/64 ... [wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/9.2.0 2) openmpi-gcc/3.1.0</p>
-<pre><code>
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun --version
+mpirun (Open MPI) 3.1.0
 
-# MPI version compatibility (1)
+Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; /opt/ompi/bin/mpirun -np 2 /opt/mpitest
+Hello, I am on n0000.scs00 rank 0/2
+Hello, I am on n0000.scs00 rank 1/2</code></pre>
+</div>
+<div id="run-mpi-containers" class="slide section level1">
+<h1>Run MPI containers</h1>
+<ul>
+<li>Use MPI libraries soly within a container</li>
+<li>MPI tasks are launched within a container, no dependence on host, however can't expand to multiple nodes</li>
+</ul>
+<pre><code>[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
+Hello, I am on n0000.scs00 rank 0/2
+Hello, I am on n0000.scs00 rank 1/2
 
-- Mismatch of MPI libaries on the host and within the container break containers
-- Extra caution to ensure MPI library compatibity
-</code></pre>
-<p>[wfeinstein@n0000 singularity-test]$ ls *.sif mpi2.0.4.sif mpi3.0.1.sif mpi3.1.0.sif mpi4.0.1.sif</p>
-<p>[wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/9.2.0 2) openmpi/4.0.1-gcc</p>
-<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 1/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4</p>
-<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 1/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4</p>
-<h2 id="wfeinsteinn0000-singularity-test-mpirun--np-4---hostfile-host-singularity-exec-mpi2.0.4.sif-optmpitest">[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi2.0.4.sif /opt/mpitest</h2>
-<p>It looks like MPI_INIT failed for some reason; your parallel process is likely to abort. There are many reasons that a parallel process can ....</p>
-<pre><code>
-# MPI version compatibility (2)</code></pre>
-<p>[wfeinstein@n0000 singularity-test]$ module list Currently Loaded Modulefiles: 1) gcc/6.3.0 2) openmpi/3.0.1-gcc</p>
-<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest Hello, I am on n0098.lr6 rank 2/4 Hello, I am on n0098.lr6 rank 3/4 Hello, I am on n0098.lr6 rank 0/4 Hello, I am on n0098.lr6 rank 1/4</p>
-<p>[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest [n0098.lr6:115220] PMIX ERROR: OUT-OF-RESOURCE in file client/pmix_client.c at line 225 [n0098.lr6:115220] OPAL ERROR: Error in file pmix3x_client.c at line 112 ...</p>
-<pre><code>
+[wfeinstein@n0000 singularity-test]$ module list
+No Modulefiles Currently Loaded.</code></pre>
+<ul>
+<li>Rely on the MPI implementation available on the host</li>
+<li>Can expand to multiple nodes</li>
+</ul>
+<pre><code>[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
+...
+Hello, I am on n0099.lr6 rank 34/64
+Hello, I am on n0098.lr6 rank 27/64
+Hello, I am on n0099.lr6 rank 41/64
+Hello, I am on n0098.lr6 rank 31/64
+...
+[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/9.2.0           2) openmpi-gcc/3.1.0</code></pre>
+</div>
+<div id="mpi-version-compatibility-1" class="slide section level1">
+<h1>MPI version compatibility (1)</h1>
+<ul>
+<li>Mismatch of MPI libaries on the host and within the container breaks container</li>
+<li>Extra caution to ensure MPI library compatibility</li>
+</ul>
+<pre><code>[wfeinstein@n0000 singularity-test]$ ls  *.sif
+mpi2.0.4.sif  mpi3.0.1.sif  mpi3.1.0.sif  mpi4.0.1.sif
 
-# GPU contrainers
+[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/9.2.0           2) openmpi/4.0.1-gcc
 
-- Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution
-- Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
-  - --nv enables NVIDIA GPU support by providing the driver on the host
-- NVIDIA driver not present in the container image itself
-- Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
-  - e.g., CUDA/11.2 requires NVIDIA drivr &gt;= R450 
-- Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 1/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
 
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 1/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
 
-# GPU container examples
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi2.0.4.sif /opt/mpitest
+--------------------------------------------------------------------------
+It looks like MPI_INIT failed for some reason; your parallel process is
+likely to abort.  There are many reasons that a parallel process can
+....</code></pre>
+</div>
+<div id="mpi-version-compatibility-2" class="slide section level1">
+<h1>MPI version compatibility (2)</h1>
+<pre><code>[wfeinstein@n0000 singularity-test]$ module list
+Currently Loaded Modulefiles:
+  1) gcc/6.3.0           2) openmpi/3.0.1-gcc
 
-- Build PyTorch GPU container from [PyTorch docker NGC](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)</code></pre>
-<p>docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3 singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</p>
-<pre><code>- Run PyTorch on a GPU node</code></pre>
-<p>[wfeinstein@n0043 pytorch]$ nvidia-smi -L GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152) GPU 1: Tesla V100-SXM2-32GB (UUID: GPU-3c41dc39-df54-1582-4d27-6c8454ed96c6)</p>
-<p>[wfeinstein@n0043 singularity-test]$ nvidia-smi Mon Apr 19 00:32:43 2021<br />
-+-----------------------------------------------------------------------------+ | NVIDIA-SMI 440.44 Driver Version: 440.44 CUDA Version: 10.2 | ...</p>
-<p>[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c &quot;import torch; print(torch.<strong>version</strong>);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot; 1.9.0a0+df837d0 Tesla V100-SXM2-32GB 11.2</p>
-<p>[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif python -c &quot;import torch; print(torch.<strong>version</strong>);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot; 1.4.0a0+a5b4d78 Tesla V100-SXM2-32GB 10.2</p>
-<p>```</p>
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi3.0.1.sif /opt/mpitest
+Hello, I am on n0098.lr6 rank 2/4
+Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 0/4
+Hello, I am on n0098.lr6 rank 1/4
+
+[wfeinstein@n0000 singularity-test]$ mpirun -np 4 --hostfile host singularity exec mpi4.0.1.sif /opt/mpitest
+[n0098.lr6:115220] PMIX ERROR: OUT-OF-RESOURCE in file client/pmix_client.c at line 225
+[n0098.lr6:115220] OPAL ERROR: Error in file pmix3x_client.c at line 112
+...</code></pre>
+</div>
+<div id="gpu-containers" class="slide section level1">
+<h1>GPU containers</h1>
+<ul>
+<li>Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution</li>
+<li>Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
+<ul>
+<li>--nv enables NVIDIA GPU support by providing the driver on the host</li>
+</ul></li>
+<li>NVIDIA driver not present in the container image itself</li>
+<li>Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+<ul>
+<li>e.g., CUDA/11.2 requires NVIDIA driver &gt;= R450</li>
+</ul></li>
+<li>Host driver version requirements are detailed in <a href="https://docs.nvidia.com/deploy/cuda-compatibility/index.html">NGC documentation</a></li>
+</ul>
+</div>
+<div id="gpu-container-examples" class="slide section level1">
+<h1>GPU container examples</h1>
+<ul>
+<li>Build PyTorch GPU container from <a href="https://ngc.nvidia.com/catalog/containers/nvidia:pytorch">PyTorch Docker NGC registry</a></li>
+</ul>
+<pre><code>docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
+singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</code></pre>
+<ul>
+<li>Run PyTorch on a GPU node</li>
+</ul>
+<pre><code>[wfeinstein@n0043 pytorch]$ nvidia-smi -L
+GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152)
+GPU 1: Tesla V100-SXM2-32GB (UUID: GPU-3c41dc39-df54-1582-4d27-6c8454ed96c6)
+
+[wfeinstein@n0043 singularity-test]$ nvidia-smi
+Mon Apr 19 00:32:43 2021       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.44       Driver Version: 440.44       CUDA Version: 10.2     |
+...
+
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
+1.9.0a0+df837d0
+Tesla V100-SXM2-32GB
+11.2
+
+[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif  python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
+1.4.0a0+a5b4d78
+Tesla V100-SXM2-32GB
+10.2</code></pre>
 </div>
 <div id="olivers-content" class="slide section level1">
 <h1>Oliver's content</h1>
@@ -511,7 +652,6 @@ Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test&gt; ls /opt
 <li><a href="https://carpentries-incubator.github.io/docker-introduction/index.html">Software Carpentries Docker training</a></li>
 <li><a href="https://carpentries-incubator.github.io/singularity-introduction/">Software Carpentries Singularity training</a></li>
 </ul>
-<p>(any others?)</p>
 </div>
 <div id="how-to-get-additional-help" class="slide section level1">
 <h1>How to get additional help</h1>

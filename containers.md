@@ -1,4 +1,4 @@
-% Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows
+% Introduction to Containers: Creating Reproducible, Scalable, and Portable Workflows (tinyurl.com/brc-apr21)
 % April 21, 2021 
 % Nicolas Chan, Wei Feinstein, Oliver Muellerklein, and Chris Paciorek
 
@@ -24,17 +24,24 @@ The materials for this tutorial are available using git at the short URL ([tinyu
 
 This training session will cover the following topics:
 
- - Introduction to containers
+ - Introduction to containers (Chris) 
     - Comparison with VMs
     - Docker and Singularity
     - Advantages of containers
- - Basic usage of containers
+ - Basic usage of containers (Chris)
     - Demo of running a Singularity container
     - More details on running a container
     - Use with Slurm
     - Sources of images
+ - Building containers (Nicolas)
+    - Various ways to build Singularity containers
+    - Using definition files
+    - Using registries
+    - Rewritable/sandbox images
+ - Specialized uses (Wei)
+    - MPI
+    - GPUs
 
-(Chris will finalize with items for Wei, Oliver, Nicolas sections)
 
 # What is a container?
 
@@ -136,21 +143,21 @@ How can Singularity leverage Docker?
 - No root/sudo privilege is needed
 - Download or build immutable squashfs images/containers
 
-```
+```bash
 singularity pull --help
 ```
 
 - Pull a container from DockerHub.
+```bash
+singularity pull docker://ubuntu:18.04 
+singularity pull docker://rocker/r-base:latest
+singularity pull docker://postgres
+ls -lrt | tail -n 10   # careful of your quota!
+ls -l ~/.singularity
+singularity cache list
 ```
-$ singularity pull docker://ubuntu:18.04 
-$ singularity pull docker://rocker/r-base:latest
-$ singularity pull docker://postgres
-$ ls -lrt | tail -n 10   # careful of your quota!
-$ ls -l ~/.singularity
-$ singularity cache list
-```
-
-```
+- Now run the container
+```bash
 singularity run ubuntu_18.04.sif       # use downloaded image file
 ## alternatively, use ~/.singularity/cache
 singularity run docker://ubuntu:18.04  
@@ -158,7 +165,7 @@ singularity run docker://ubuntu:18.04
 
 Note the change in prompt.
 
-```
+```bash
 cat /etc/issue   # not the Savio OS!
 which python     # not much here!
 pwd
@@ -168,7 +175,7 @@ exit
 cat /global/scratch/paciorek/junk.txt
 ```
 
-```
+```bash
 singularity run docker://rocker/r-base    # easy!
 singularity run docker://postgres         # sometimes things are complicated!
 ```
@@ -177,14 +184,14 @@ singularity run docker://postgres         # sometimes things are complicated!
 
 - Singularity Hub: If no tag is specified, the master branch of the repository is used
 
-```
+```bash
 $ singularity pull hello-world.sif shub://singularityhub/hello-world
 $ singularity run hello-world.sif
 ```
 
 Here's how one runs a Docker container (on a system where you have admin access and Docker installed):
 
-```
+```bash
 echo $HOME
 docker run -it --rm rocker/r-base bash
 pwd
@@ -195,21 +202,21 @@ ls /accounts/gen/vis/paciorek    # no automatic mount of my host home directory
 # Different ways of using a Singularity container
 
 - **shell** sub-command: invokes an interactive shell within a container
-```
+```bash
 singularity shell hello-world.sif
 ```
 - **run** sub-command: executes the container’s runscript
-```
+```bash
 singularity run hello-world.sif
 ```
 - **exec** sub-command: execute an arbitrary command within container
-```
+```bash
 singularity exec hello-world.sif cat /etc/os-release
 ```
 
 Let's see what we can find out about this image:
 
-```
+```bash
 singularity inspect -r hello-world.sif
 ```
 
@@ -219,7 +226,7 @@ Let's see how the container processes show up from the perspective of the host O
 
 We'll run some intensive linear algebra in R.
 
-```
+```bash
 singularity run docker://rocker/r-base:latest
 ```
 
@@ -242,7 +249,7 @@ We see in `top` that the R process running in the container shows up as an R pro
      - mount /host/path/ on the host to /container/path inside the container
      - `-B /host/path/:/container/path`
 
-```
+```bash
 ls /global/scratch/paciorek/wikistats_small
 singularity shell -B /global/scratch/paciorek/wikistats_small:/data hello-world.sif
 ls /data
@@ -251,7 +258,7 @@ exit
 ls -l /global/scratch/paciorek/wikistats_small
 ```
 
-In general one would do I/O to data on the host system rather than writing into the container.
+In general one would do I/O to files on the host system rather than writing into the container.
 
 It is possible to create writeable containers. 
 
@@ -261,7 +268,7 @@ You can run Singularity within an `sbatch` or `srun` session.
 
 Here's a basic job script.
 
-```
+```bash
 #!/bin/bash 
 #SBATCH --job-name=container-test		 
 #SBATCH --partition=savio2		 
@@ -284,20 +291,13 @@ Let's see an [example of the Continuum images](https://hub.docker.com/u/continuu
 (For images provided directly by Docker, you don't specify the OWNER.)
 
 
-# Singularity workflow (leading into Nicolas' material)
-
-- [install Singularity locally](https://docs.google.com/document/d/10XAtH9yj5uyiHr3eGHTk9h82bZXEp0aixMCmgYJhGNQ/edit?usp=sharing) (or build an image in the cloud) 
-- transfer image to Savio
-- run container on Savio
-
-# Nicolas' content
-
 # Approaches to Building
-- Build a Docker image and convert
-  - Convenient if you already have a Docker build file
-- Build from Singularity definition file
-  - Bootstrap from another Singularity container or non-Docker base OS
-  - Alows extra customization with directives
+
+ - Build a Docker image and convert
+    - Convenient if you already have a Docker build file
+ - Build from Singularity definition file
+    - Bootstrap from another Singularity container or non-Docker base OS
+    - Alows extra customization with directives
 
 # Building a Docker container
 ```docker
@@ -333,21 +333,21 @@ docker push ghcr.io/nicolaschan/cowsay-entrypoint:latest
 docker push ghcr.io/nicolaschan/cowsay-cmd:latest
 ```
 You can use the Docker container registry of your choice
-or deploy your own registry: https://docs.docker.com/registry/deploying/
+or deploy your own registry: [https://docs.docker.com/registry/deploying/](https://docs.docker.com/registry/deploying/)
 
 # Converting Docker to Singularity
 - `singularity run docker://ghcr.io/nicolaschan/cowsay-entrypoint hi`
 - `singularity build cowsay.simg docker://ghcr.io/nicolaschan/cowsay-entrypoint`
 
-Reference: https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md
+Reference: [https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md](https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md)
 
 # Singularity Build Strategies
-- Install Singularity locally (demo today)
-  - Requires root access on your system
-- Install Docker locally and use singularity-docker
-  - https://github.com/singularityhub/singularity-docker
-- Build an image on a cloud service or continuous integration host
-  - Sylabs Remote Builder: https://cloud.sylabs.io/builder
+ - Install Singularity locally (demo today)
+    - Requires root access on your system
+ - Install Docker locally and use singularity-docker
+    - https://github.com/singularityhub/singularity-docker
+ - Build an image on a cloud service or continuous integration host
+    - Sylabs Remote Builder: https://cloud.sylabs.io/builder
 
 # Suggestions/Pitfalls
 - Match CPU architecture of host where image is built and Savio
@@ -377,12 +377,12 @@ Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
 Reference: https://github.com/ucb-rit/savio-singularity-template
 
 # Singularity Build Example (demo)
-- `sudo singularity build alpine-example.simg alpine-example.def`
-- `singularity run alpine-example.simg`
-- `scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.`
-- On Savio: `singularity run alpine-example.simg`
-- On Savio: `singularity exec alpine-example.simg sh`
-  - `echo $MY_VAR_VALUE`
+ - `sudo singularity build alpine-example.simg alpine-example.def`
+ - `singularity run alpine-example.simg`
+ - `scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.`
+ - On Savio: `singularity run alpine-example.simg`
+ - On Savio: `singularity exec alpine-example.simg sh`
+     - `echo $MY_VAR_VALUE`
 
 # Rewritable/Sandbox Singularity Images
 - Can be used for debugging software/images
@@ -408,15 +408,13 @@ Similar to Docker registry, you can use the Singularity registry of your choice.
 This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work).
 For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html
 
-# Wei's content
-
 # Outline of MPI and GPU Containers 
 
-- MPI (Message Passing Interface) applications can utilize multiple nodes
-- Build and run MPI containers
-  - Single node only
-  - Cross multiple nodes: Rely on the MPI implementation available on the host 
-- MPI library version compatibility on the host and within containers
+ - MPI (Message Passing Interface) applications can utilize multiple nodes
+ - Build and run MPI containers
+    - Single node only
+    - Cross multiple nodes: Rely on the MPI implementation available on the host 
+ - MPI library version compatibility on the host and within containers
 
 
 - Build GPU containers from a docker at NGC 
@@ -426,7 +424,8 @@ For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.ht
  
 # Build MPI singularity containers
 
-- MPI application example: [mpitest.c](samples/mpitest.c) 
+- MPI application example: [mpitest.c](samples/mpitest.c)
+
 ```
 [wfeinstein@n0000 singularity-test]$ cat host 
 n0098.lr6
@@ -440,6 +439,7 @@ Hello, I am on n0099.lr6 rank 2/4
 Hello, I am on n0099.lr6 rank 2/4
 ...
 ```
+
 - Definition file  
 [SINGULARITY-mpi3.1.0.def](samples/SINGULARITY-mpi3.1.0.def)
 
@@ -447,8 +447,10 @@ Hello, I am on n0099.lr6 rank 2/4
 ```
 sudo singularity build mpi3.1.0.sif SINGULARITY-mpi3.1.0.def
 ```
-- Transfer mpi3.1.0.sif to your perferred cluster
+
+- Transfer mpi3.1.0.sif to your preferred cluster
 - Check out the container
+
 ```
 [wfeinstein@n0000 singularity-test]$ singularity shell mpi3.1.0.sif         
 Singularity mpi3.1.0.sif:/global/scratch/wfeinstein/singularity-test> ls /opt/
@@ -464,8 +466,9 @@ Hello, I am on n0000.scs00 rank 1/2
  
 # Run MPI containers
 
-- Use MPI libaries soly within a constainer
-- MPI tasks are launched within a container, no dependece on host, however can't expand to multiple nodes
+- Use MPI libraries soly within a container
+- MPI tasks are launched within a container, no dependence on host, however can't expand to multiple nodes
+
 ```
 [wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
 Hello, I am on n0000.scs00 rank 0/2
@@ -474,8 +477,9 @@ Hello, I am on n0000.scs00 rank 1/2
 [wfeinstein@n0000 singularity-test]$ module list
 No Modulefiles Currently Loaded.
 ```
+
 - Rely on the MPI implementation available on the host
-- Can expand to multple nodes 
+- Can expand to multiple nodes 
 
 ```
 [wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
@@ -493,8 +497,8 @@ Currently Loaded Modulefiles:
 
 # MPI version compatibility (1)
 
-- Mismatch of MPI libaries on the host and within the container break containers
-- Extra caution to ensure MPI library compatibity
+- Mismatch of MPI libaries on the host and within the container breaks container
+- Extra caution to ensure MPI library compatibility
 
 ```
 [wfeinstein@n0000 singularity-test]$ ls  *.sif
@@ -524,6 +528,7 @@ likely to abort.  There are many reasons that a parallel process can
 ```
 
 # MPI version compatibility (2)
+
 ```
 [wfeinstein@n0000 singularity-test]$ module list
 Currently Loaded Modulefiles:
@@ -541,26 +546,28 @@ Hello, I am on n0098.lr6 rank 1/4
 ...
 ```
 
+# GPU containers
 
-# GPU contrainers
-
-- Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution
-- Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
-  - --nv enables NVIDIA GPU support by providing the driver on the host
-- NVIDIA driver not present in the container image itself
-- Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
-  - e.g., CUDA/11.2 requires NVIDIA drivr >= R450 
-- Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
+ - Singularity supports NVIDIA’s CUDA GPU compute framework or AMD’s ROCm solution
+ - Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
+    - --nv enables NVIDIA GPU support by providing the driver on the host
+ - NVIDIA driver not present in the container image itself
+ - Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+    - e.g., CUDA/11.2 requires NVIDIA driver >= R450 
+ - Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
 
 
 # GPU container examples
 
-- Build PyTorch GPU container from [PyTorch docker NGC](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)
+- Build PyTorch GPU container from [PyTorch Docker NGC registry](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)
+
 ```
 docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
 singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3
 ```
+
 - Run PyTorch on a GPU node
+
 ```
 [wfeinstein@n0043 pytorch]$ nvidia-smi -L
 GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152)
@@ -581,7 +588,6 @@ Tesla V100-SXM2-32GB
 1.4.0a0+a5b4d78
 Tesla V100-SXM2-32GB
 10.2
-
 ```
 
 
@@ -594,7 +600,6 @@ Tesla V100-SXM2-32GB
 - [Software Carpentries Docker training](https://carpentries-incubator.github.io/docker-introduction/index.html)
 - [Software Carpentries Singularity training](https://carpentries-incubator.github.io/singularity-introduction/)
 
-(any others?)
 
 # How to get additional help
 
