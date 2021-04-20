@@ -119,10 +119,10 @@ What is Singularity?
 
 How can Singularity leverage Docker?
 
-- Create and run a Singularity container based on a Docker image
-- (transform a Dockerfile?)
+ - Create and run a Singularity container based on a Docker image
+      - From DockerHub
+      - By archiving a Docker image (and transferring to Savio)
 - Create Singularity images by running Singularity in a Docker container
-- other?
 
 # Examples of where containers are used
 
