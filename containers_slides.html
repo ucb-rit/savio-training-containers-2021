@@ -248,9 +248,9 @@ April 21, 2021
 <span class="fu">which</span> python     # not much here!
 <span class="bu">pwd</span>
 <span class="bu">echo</span> <span class="st">&quot;written from the container&quot;</span> <span class="op">&gt;</span> junk.txt
-<span class="fu">ls</span> /global/scratch/paciorek <span class="kw">|</span> <span class="fu">head</span> -n 5
+<span class="fu">ls</span> -l /global/home/users/paciorek <span class="kw">|</span> <span class="fu">head</span> -n 5
 <span class="bu">exit</span>
-<span class="fu">cat</span> /global/scratch/paciorek/junk.txt</code></pre></div>
+<span class="fu">cat</span> /global/home/users/paciorek/junk.txt</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run docker://rocker/r-base    # easy!
 <span class="ex">singularity</span> run docker://postgres         # sometimes things are complicated!</code></pre></div>
 </div>

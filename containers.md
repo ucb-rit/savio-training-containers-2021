@@ -170,9 +170,9 @@ cat /etc/issue   # not the Savio OS!
 which python     # not much here!
 pwd
 echo "written from the container" > junk.txt
-ls /global/scratch/paciorek | head -n 5
+ls -l /global/home/users/paciorek | head -n 5
 exit
-cat /global/scratch/paciorek/junk.txt
+cat /global/home/users/paciorek/junk.txt
 ```
 
 ```bash
