@@ -384,6 +384,31 @@ Reference: [https://sylabs.io/guides/3.0/user-guide/definition_files.html](https
 
 Reference: [https://github.com/ucb-rit/savio-singularity-template](https://github.com/ucb-rit/savio-singularity-template)
 
+# Singularity Definition File Example
+```
+Bootstrap: docker
+From: alpine:latest
+
+%setup
+  # Executed on host system before container is built
+  echo "Hello from setup"
+
+%environment
+  export MY_VAR=my_var_value
+
+%post
+  # Executed within the container at build time
+  echo "Post starting"
+  apk add asciiquarium
+  mkdir -p /app
+  echo 'echo $MY_VAR' >> /app/hello.sh
+  echo "Post finished"
+
+%runscript
+  # Executed with `singularity run alpine-example.simg` or `./alpine-example.simg`
+  asciiquarium
+```
+
 # Singularity Build Example (Demo)
 On local machine, using files from this repository: [https://github.com/ucb-rit/savio-training-containers-2021](https://github.com/ucb-rit/savio-training-containers-2021)
 ```bash
