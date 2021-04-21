@@ -438,7 +438,7 @@ On Savio:
 ```bash
 singularity run alpine-example.simg
 singularity exec alpine-example.simg sh
-echo $MY_VAR_VALUE
+echo $MY_VAR
 ```
 
 If using singularity-docker:
