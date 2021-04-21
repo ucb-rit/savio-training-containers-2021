@@ -410,35 +410,41 @@ For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.ht
 
 # Outline of MPI and GPU Containers 
 
- - MPI (Message Passing Interface) applications can utilize multiple nodes
- - Build and run MPI containers
-    - Single node only
-    - Cross multiple nodes: Rely on the MPI implementation available on the host 
- - MPI library version compatibility on the host and within containers
+- Build singularity containers from a definition file 
+- Run MPI containers
+  - Rely on MPI library soly within the container: single node only
+  - Rely on the MPI library available on the host, multiple nodes possible
+- MPI library version compatibility on the host and within containers
 
-
-- Build GPU containers from a docker at NGC 
+- Build GPU singularity containers from a docker image
 - Run GPU containers
-- NVIDIA driver and CUDA version compatibility
+- NVIDIA driver and CUDA library version compatibility
 
- 
-# Build MPI singularity containers
+
+# MPI Application 
 
 - MPI application example: [mpitest.c](samples/mpitest.c)
 
 ```
-[wfeinstein@n0000 singularity-test]$ cat host 
+[wfeinstein@n0000 singularity]salloc -p lr6  -A account_xxx -N 2 -q lr_normal -t 2:0:0
+salloc: Pending job allocation 30456801
+salloc: job 30456801 queued and waiting for resources
+...
+salloc: Nodes n0098.lr6,n0099.lr6 are ready for job
+
+[wfeinstein@n0000 singularity-test]$ echo $SLURM_NODELIST |tr ',' '\n' > host
 n0098.lr6
 n0099.lr6
 
-[wfeinstein@n0000 singularity]$ mpirun -np 4  --hostfile host mpitest
-...
+[wfeinstein@n0000 singularity]$ mpirun -np 4 --hostfile host -npernode 2 mpitest
 Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0099.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 2/4
 Hello, I am on n0099.lr6 rank 2/4
-Hello, I am on n0099.lr6 rank 2/4
-...
+
 ```
+
+# Build MPI singularity containers
 
 - Definition file  
 [SINGULARITY-mpi3.1.0.def](samples/SINGULARITY-mpi3.1.0.def)
@@ -466,9 +472,9 @@ Hello, I am on n0000.scs00 rank 1/2
  
 # Run MPI containers
 
-- Use MPI libraries soly within a container
-- MPI tasks are launched within a container, no dependence on host, however can't expand to multiple nodes
-
+- Approach 1
+- Launch MPI tasks within a container, no dependece on host
+- However can't expand to multiple nodes
 ```
 [wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
 Hello, I am on n0000.scs00 rank 0/2
@@ -478,8 +484,10 @@ Hello, I am on n0000.scs00 rank 1/2
 No Modulefiles Currently Loaded.
 ```
 
-- Rely on the MPI implementation available on the host
-- Can expand to multiple nodes 
+- Approach 2
+- Launched MPI processes from the host
+- Rely on the MPI implementations provided on the host
+- Can expand to multple nodes
 
 ```
 [wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
@@ -552,15 +560,13 @@ Hello, I am on n0098.lr6 rank 1/4
  - Userspace NVIDIA driver components from the host are dynamically mounted in the container at runtime
     - --nv enables NVIDIA GPU support by providing the driver on the host
  - NVIDIA driver not present in the container image itself
- - Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+ - Application built against a CUDA toolkit has a minimal host NVIDIA driver requirement
     - e.g., CUDA/11.2 requires NVIDIA driver >= R450 
- - Host driver version requirements are detailed in [NGC documentation](https://docs.nvidia.com/deploy/cuda-compatibility/index.html)
-
+ - Minimal driver requirement for a specific version of the CUDA runtime/toolkit, [check it out here](https://docs.nvidia.com/deploy/cuda-compatibility/index.html) 
 
 # GPU container examples
 
-- Build PyTorch GPU container from [PyTorch Docker NGC registry](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)
-
+- Build PyTorch GPU containers from the [NGC registry](https://ngc.nvidia.com/catalog/containers/nvidia:pytorch)
 ```
 docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
 singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3
@@ -579,12 +585,18 @@ Mon Apr 19 00:32:43 2021
 | NVIDIA-SMI 440.44       Driver Version: 440.44       CUDA Version: 10.2     |
 ...
 
-[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c "import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)"
+[wfeinstein@n0043 pytorch]$ cat pytorch_test.py
+import torch; 
+print(torch.__version__);
+print(torch.cuda.get_device_name(0)); 
+print(torch.version.cuda)
+
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python pytorch_test.py
 1.9.0a0+df837d0
 Tesla V100-SXM2-32GB
 11.2
 
-[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif  python -c "import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)"
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_19_12_py3.sif python pytorch_test.py
 1.4.0a0+a5b4d78
 Tesla V100-SXM2-32GB
 10.2
