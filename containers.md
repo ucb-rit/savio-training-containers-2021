@@ -299,7 +299,7 @@ Let's see an [example of the Continuum images](https://hub.docker.com/u/continuu
     - Bootstrap from another Singularity container, Docker image, or supported base OS
     - Alows extra customization with directives
 
-# Building a Docker container
+# Building a Docker Container (Demo)
 ```docker
 FROM centos:7
 RUN yum install -y epel-release && yum install -y cowsay
@@ -314,7 +314,7 @@ docker build -t ghcr.io/nicolaschan/cowsay-entrypoint:latest -f cowsay-entrypoin
 docker build -t ghcr.io/nicolaschan/cowsay-cmd:latest -f cowsay-cmd .
 ```
 
-# Running Docker container
+# Running Docker Container (Demo)
 ENTRYPOINT Docker container:
 ```bash
 docker run ghcr.io/nicolaschan/cowsay-entrypoint hi
@@ -384,13 +384,16 @@ Reference: [https://sylabs.io/guides/3.0/user-guide/definition_files.html](https
 
 Reference: [https://github.com/ucb-rit/savio-singularity-template](https://github.com/ucb-rit/savio-singularity-template)
 
-# Singularity Build Example (demo)
+# Singularity Build Example (Demo)
+On local machine, using files from this repository: [https://github.com/ucb-rit/savio-training-containers-2021](https://github.com/ucb-rit/savio-training-containers-2021)
 ```bash
 sudo singularity build alpine-example.simg alpine-example.def
 singularity run alpine-example.simg
 scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.
+```
 
-# On Savio:
+On Savio:
+```bash
 singularity run alpine-example.simg
 singularity exec alpine-example.simg sh
 echo $MY_VAR_VALUE
@@ -409,7 +412,7 @@ docker run --privileged -t --rm -v $PWD:/app quay.io/singularity/singularity:v3.
   - Harder to rebuild reproducibly
   - Some processes still require root (not just permissions for files)
 
-# Rewritable/Sandbox Demo
+# Rewritable/Sandbox Images (Demo)
 On Savio:
 ```bash
 singularity build --sandbox alpine-sandbox docker://alpine
