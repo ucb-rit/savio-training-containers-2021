@@ -296,7 +296,7 @@ Let's see an [example of the Continuum images](https://hub.docker.com/u/continuu
  - Build a Docker image and convert
     - Convenient if you already have a Docker build file
  - Build from Singularity definition file
-    - Bootstrap from another Singularity container or non-Docker base OS
+    - Bootstrap from another Singularity container, Docker image, or supported base OS
     - Alows extra customization with directives
 
 # Building a Docker container
@@ -338,6 +338,7 @@ or deploy your own registry: [https://docs.docker.com/registry/deploying/](https
 # Converting Docker to Singularity
 - `singularity run docker://ghcr.io/nicolaschan/cowsay-entrypoint hi`
 - `singularity build cowsay.simg docker://ghcr.io/nicolaschan/cowsay-entrypoint`
+  - `build` behaves similarly to `pull` in this context
 
 Reference: [https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md](https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md)
 
@@ -346,6 +347,7 @@ Reference: [https://github.com/ucb-rit/savio-singularity-template/blob/master/bu
     - Requires root access on your system
  - Install Docker locally and use singularity-docker
     - https://github.com/singularityhub/singularity-docker
+    - Note: You must specify the version/tag such as `:3.7.1` for these images
  - Build an image on a cloud service or continuous integration host
     - Sylabs Remote Builder: https://cloud.sylabs.io/builder
 
@@ -355,6 +357,12 @@ Reference: [https://github.com/ucb-rit/savio-singularity-template/blob/master/bu
 - Savio will try to bind mount the following paths by default (from `/etc/singularity/singularity.conf`):
 
 ```
+/etc/passwd
+/etc/resolv.conf
+/proc
+/sys
+/dev
+/tmp
 bind path = /etc/localtime
 bind path = /etc/hosts
 bind path = /global/scratch
@@ -365,7 +373,7 @@ bind path = /global/home/users
 1. **Header**: Base to build the container off of, such as an existing Docker/Singularity/OS image
 2. **Sections**: Denoted by a `%` which are executed once the container is built to configure it
 
-Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
+Reference: [https://sylabs.io/guides/3.0/user-guide/definition_files.html](https://sylabs.io/guides/3.0/user-guide/definition_files.html)
 
 # Singularity Build Example
 - Building simple alpine asciiquarium image: `alpine-example.def`
@@ -374,7 +382,7 @@ Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html
 - `%post`: Executed within the container at build time
 - `%runscript`: Executed with `singularity run busybox-example.simg` or `./busybox-example.simg`
 
-Reference: https://github.com/ucb-rit/savio-singularity-template
+Reference: [https://github.com/ucb-rit/savio-singularity-template](https://github.com/ucb-rit/savio-singularity-template)
 
 # Singularity Build Example (demo)
  - `sudo singularity build alpine-example.simg alpine-example.def`
@@ -384,9 +392,18 @@ Reference: https://github.com/ucb-rit/savio-singularity-template
  - On Savio: `singularity exec alpine-example.simg sh`
      - `echo $MY_VAR_VALUE`
 
+If using singularity-docker:
+```bash
+docker run --privileged -t --rm -v $PWD:/app quay.io/singularity/singularity:v3.7.1 build /app/alpine-example.simg /app/alpine-example.def
+```
+
 # Rewritable/Sandbox Singularity Images
-- Can be used for debugging software/images
-- Prefer using a build script for reproducible builds
+- Advantages:
+  - Easier debugging (software installs, existing images, etc.)
+  - Container can be built on Savio
+- Disadvantages:
+  - Harder to rebuild reproducibly
+  - Some processes still require root (not just permissions for files)
 
 # Rewritable/Sandbox Demo
 On Savio:
@@ -401,12 +418,12 @@ singularity build alpine-sandbox.sif alpine-sandbox/
 hi
 ```
 
-Reference: https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories
+Reference: [https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories](https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories)
 
 # Pushing to Singularity Registry
 Similar to Docker registry, you can use the Singularity registry of your choice.
 This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work).
-For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html
+For details, see [https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html](https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories)
 
 # Outline of MPI and GPU Containers 
 
