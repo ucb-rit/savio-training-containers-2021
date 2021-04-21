@@ -673,6 +673,63 @@ Tesla V100-SXM2-32GB
 
 # Oliver's content
 
+# High-level View: Containerization of Scientific Workflows
+
+# Benefits of Singularity 
+
+- Single image file = easily shareable
+- Close to the hardware **(runs at kernel host level)** 
+- Bring Your Own Software (BYOS) **Install whatever you want inside** 
+- Simultaneous use of multiple HPC clusters 
+- Get more citations for your software!
+
+# Non-resource intensive 
+
+**Especially compared to VMs**
+
+Unlike VMs that replicate an entire OS and all dependencies, containers run as light-weight apps on the kernel host. 
+
+Singularity was developed to run "close to the hardware". 
+
+E.g. Singularity images run off of the kernel host level, thus, they suffer minimal performance loss. 
+
+# Shareable 
+
+Further, distirbuting multiple images is a non-intensive effort jump from running a single Singularity image. 
+
+Nearly all NSF-funded XSEDE clusters have Singularity installed on them. To deploy your encapsulated workflow from a single cluster, **e.g. Savio**, to multiple simultaneously only requires a single *FILE.sif* to be transferred from your machine or the Savio cluster filesystem to the various XSEDE clusters. 
+
+FILE.sif files can be transffered with both CLI, *e.g. scp commands*, or GUI, *e.g. Globus*, interfaces.
+
+*Copy .tar to one of several XSEDE clusters*
+
+The following example demostrates using the CLI *(e.g. Terminal)* to copy a .tar from a cluster or personal machine to XSEDE's Bridges cluster. 
+
+```
+    $ scp MYFILE.tar USERNAME@bridges.psc.edu
+    $ ssh USERNAME@bridges.psc.edu
+    $ singularity build myimage.sif docker-archive://MYFILE.tar
+```
+
+# Portability 
+
+*Scientific and HPC use-case* = researchers need to run jobs across whatever resources they can get to obtain results. 
+
+Singularity images can run on any system with the same architecture that the image was made in. 
+
+E.g. An image made on a computer with a x86-64 architecture can be run on any other system / computer with a x86-64 architecture.
+
+# Reproducible
+
+Singularity images encapsulate your code, software dependencies, data, documentation, licenses, etc. 
+
+A singularity image can have a *DOI* and thus be used for publications. 
+
+This approach can dramatically increase your citation count!
+
+There is exponentially more and more interest and attention in citing and publishing software. 
+
+
 # Other container resources
 
 - [San Diego supercomputing center training (big picture presentation)](https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/)
