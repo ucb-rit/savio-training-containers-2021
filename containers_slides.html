@@ -125,6 +125,8 @@ April 21, 2021
 <li>MPI</li>
 <li>GPUs</li>
 </ul></li>
+<li>Containerizing scientific workflows (Oliver)</li>
+<li>Other resources</li>
 </ul>
 </div>
 <div id="what-is-a-container" class="slide section level1">
@@ -502,7 +504,7 @@ From: alpine:latest
 <p>On Savio:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run alpine-example.simg
 <span class="ex">singularity</span> exec alpine-example.simg sh
-<span class="bu">echo</span> <span class="va">$MY_VAR_VALUE</span></code></pre></div>
+<span class="bu">echo</span> <span class="va">$MY_VAR</span></code></pre></div>
 <p>If using singularity-docker:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run --privileged -t --rm -v <span class="va">$PWD</span>:/app quay.io/singularity/singularity:v3.7.1 \
 build /app/alpine-example.simg /app/alpine-example.def</code></pre></div>
@@ -729,8 +731,47 @@ Tesla V100-SXM2-32GB
 Tesla V100-SXM2-32GB
 10.2</code></pre>
 </div>
-<div id="olivers-content" class="slide section level1">
-<h1>Oliver's content</h1>
+<div id="high-level-view-containerization-of-scientific-workflows" class="slide section level1">
+<h1>High-level View: Containerization of Scientific Workflows</h1>
+<p>Benefits of Singularity</p>
+<ul>
+<li>Single image file = easily shareable</li>
+<li>Close to the hardware <strong>(runs at kernel host level)</strong></li>
+<li>Bring Your Own Software (BYOS) <strong>Install whatever you want inside</strong></li>
+<li>Simultaneous use of multiple HPC clusters</li>
+<li>Get more citations for your software!</li>
+</ul>
+</div>
+<div id="non-resource-intensive" class="slide section level1">
+<h1>Non-resource intensive</h1>
+<p><strong>Especially compared to VMs</strong></p>
+<p>Unlike VMs that replicate an entire OS and all dependencies, containers run as light-weight apps on the kernel host.</p>
+<p>Singularity was developed to run &quot;close to the hardware&quot;.</p>
+<p>E.g. Singularity images run off of the kernel host level, thus, they suffer minimal performance loss.</p>
+</div>
+<div id="shareable" class="slide section level1">
+<h1>Shareable</h1>
+<p>Further, distributing multiple images is a non-intensive effort jump from running a single Singularity image.</p>
+<p>Nearly all NSF-funded XSEDE clusters have Singularity installed on them. To deploy your encapsulated workflow from a single cluster, <strong>e.g. Savio</strong>, to multiple simultaneously only requires a single <em>FILE.sif</em> to be transferred from your machine or the Savio cluster filesystem to the various XSEDE clusters.</p>
+<p>FILE.sif files can be transfered with both CLI, <em>e.g. scp commands</em>, or GUI, <em>e.g. Globus</em>, interfaces.</p>
+<p><em>Copy .tar to one of several XSEDE clusters</em></p>
+<p>The following example demostrates using the CLI <em>(e.g. Terminal)</em> to copy a .tar from a cluster or personal machine to XSEDE's Bridges cluster.</p>
+<pre><code>    $ scp MYFILE.tar USERNAME@bridges.psc.edu
+    $ ssh USERNAME@bridges.psc.edu
+    $ singularity build myimage.sif docker-archive://MYFILE.tar</code></pre>
+</div>
+<div id="portability" class="slide section level1">
+<h1>Portability</h1>
+<p><em>Scientific and HPC use-case</em> = researchers need to run jobs across whatever resources they can get to obtain results.</p>
+<p>Singularity images can run on any system with the same architecture that the image was made in.</p>
+<p>E.g. An image made on a computer with a x86-64 architecture can be run on any other system / computer with a x86-64 architecture.</p>
+</div>
+<div id="reproducible" class="slide section level1">
+<h1>Reproducible</h1>
+<p>Singularity images encapsulate your code, software dependencies, data, documentation, licenses, etc.</p>
+<p>A singularity image can have a <em>DOI</em> and thus be used for publications.</p>
+<p>This approach can dramatically increase your citation count!</p>
+<p>There is exponentially more and more interest and attention in citing and publishing software.</p>
 </div>
 <div id="other-container-resources" class="slide section level1">
 <h1>Other container resources</h1>

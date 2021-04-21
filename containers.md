@@ -53,6 +53,8 @@ This training session will cover the following topics:
  - Specialized uses (Wei)
     - MPI
     - GPUs
+ - Containerizing scientific workflows (Oliver)
+ - Other resources
 
 
 # What is a container?
@@ -670,12 +672,9 @@ Tesla V100-SXM2-32GB
 10.2
 ```
 
-
-# Oliver's content
-
 # High-level View: Containerization of Scientific Workflows
 
-# Benefits of Singularity 
+Benefits of Singularity 
 
 - Single image file = easily shareable
 - Close to the hardware **(runs at kernel host level)** 
@@ -695,11 +694,11 @@ E.g. Singularity images run off of the kernel host level, thus, they suffer mini
 
 # Shareable 
 
-Further, distirbuting multiple images is a non-intensive effort jump from running a single Singularity image. 
+Further, distributing multiple images is a non-intensive effort jump from running a single Singularity image. 
 
 Nearly all NSF-funded XSEDE clusters have Singularity installed on them. To deploy your encapsulated workflow from a single cluster, **e.g. Savio**, to multiple simultaneously only requires a single *FILE.sif* to be transferred from your machine or the Savio cluster filesystem to the various XSEDE clusters. 
 
-FILE.sif files can be transffered with both CLI, *e.g. scp commands*, or GUI, *e.g. Globus*, interfaces.
+FILE.sif files can be transfered with both CLI, *e.g. scp commands*, or GUI, *e.g. Globus*, interfaces.
 
 *Copy .tar to one of several XSEDE clusters*
 
