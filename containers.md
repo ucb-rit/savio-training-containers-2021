@@ -385,12 +385,16 @@ Reference: [https://sylabs.io/guides/3.0/user-guide/definition_files.html](https
 Reference: [https://github.com/ucb-rit/savio-singularity-template](https://github.com/ucb-rit/savio-singularity-template)
 
 # Singularity Build Example (demo)
- - `sudo singularity build alpine-example.simg alpine-example.def`
- - `singularity run alpine-example.simg`
- - `scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.`
- - On Savio: `singularity run alpine-example.simg`
- - On Savio: `singularity exec alpine-example.simg sh`
-     - `echo $MY_VAR_VALUE`
+```bash
+sudo singularity build alpine-example.simg alpine-example.def
+singularity run alpine-example.simg
+scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.
+
+# On Savio:
+singularity run alpine-example.simg
+singularity exec alpine-example.simg sh
+echo $MY_VAR_VALUE
+```
 
 If using singularity-docker:
 ```bash
