@@ -13,6 +13,18 @@
  - [Securing Research Data Working Group](https://dlab.berkeley.edu/working-groups/securing-research-data-working-group) (monthly, with next meeting May 10 at 2 pm)
 
  
+# How to get additional help
+
+ - Check the Status and Announcements page:
+    - [https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements](https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements)
+ - For technical issues and questions about using Savio:
+    - brc-hpc-help@berkeley.edu
+ - For questions about computing resources in general, including cloud computing:
+    - brc@berkeley.edu
+    - office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 [on Zoom](https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting)
+ - For questions about data management (including HIPAA-protected data):
+    - researchdata@berkeley.edu
+    - office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 [on Zoom](https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting)
 
 # Introduction
 
@@ -138,7 +150,7 @@ How can Singularity leverage Docker?
 - You can have GitHub Actions and Bitbucket Pipelines in a Docker container
 - CodeOcean capsules are built on Docker images 
 
-# Running pre-existing containers using Singularity
+# Running pre-existing containers using Singularity: Pulling
 
 - No root/sudo privilege is needed
 - Download or build immutable squashfs images/containers
@@ -148,6 +160,7 @@ singularity pull --help
 ```
 
 - Pull a container from DockerHub.
+
 ```bash
 singularity pull docker://ubuntu:18.04 
 singularity pull docker://rocker/r-base:latest
@@ -156,7 +169,11 @@ ls -lrt | tail -n 10   # careful of your quota!
 ls -l ~/.singularity
 singularity cache list
 ```
+
+# Running pre-existing containers using Singularity: Running
+
 - Now run the container
+
 ```bash
 singularity run ubuntu_18.04.sif       # use downloaded image file
 ## alternatively, use ~/.singularity/cache
@@ -426,16 +443,17 @@ echo $MY_VAR_VALUE
 
 If using singularity-docker:
 ```bash
-docker run --privileged -t --rm -v $PWD:/app quay.io/singularity/singularity:v3.7.1 build /app/alpine-example.simg /app/alpine-example.def
+docker run --privileged -t --rm -v $PWD:/app quay.io/singularity/singularity:v3.7.1 \
+build /app/alpine-example.simg /app/alpine-example.def
 ```
 
 # Rewritable/Sandbox Singularity Images
-- Advantages:
-  - Easier debugging (software installs, existing images, etc.)
-  - Container can be built on Savio
-- Disadvantages:
-  - Harder to rebuild reproducibly
-  - Some processes still require root (not just permissions for files)
+ - Advantages:
+    - Easier debugging (software installs, existing images, etc.)
+    - Container can be built on Savio
+ - Disadvantages:
+    - Harder to rebuild reproducibly
+    - Some processes still require root (not just permissions for files)
 
 # Rewritable/Sandbox Images (Demo)
 On Savio:
@@ -459,15 +477,15 @@ For details, see [https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.h
 
 # Outline of MPI and GPU Containers 
 
-- Build singularity containers from a definition file 
-- Run MPI containers
-  - Rely on MPI library soly within the container: single node only
-  - Rely on the MPI library available on the host, multiple nodes possible
-- MPI library version compatibility on the host and within containers
+ - Build singularity containers from a definition file 
+ - Run MPI containers
+     - Rely on MPI library soly within the container: single node only
+     - Rely on the MPI library available on the host, multiple nodes possible
+ - MPI library version compatibility on the host and within containers
 
-- Build GPU singularity containers from a docker image
-- Run GPU containers
-- NVIDIA driver and CUDA library version compatibility
+ - Build GPU singularity containers from a docker image
+ - Run GPU containers
+ - NVIDIA driver and CUDA library version compatibility
 
 
 # MPI Application 
@@ -475,7 +493,7 @@ For details, see [https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.h
 - MPI application example: [mpitest.c](samples/mpitest.c)
 
 ```
-[wfeinstein@n0000 singularity]salloc -p lr6  -A account_xxx -N 2 -q lr_normal -t 2:0:0
+[wfeinstein@n0000 singularity] salloc -p lr6  -A account_xxx -N 2 -q lr_normal -t 2:0:0
 salloc: Pending job allocation 30456801
 salloc: job 30456801 queued and waiting for resources
 ...
@@ -521,9 +539,10 @@ Hello, I am on n0000.scs00 rank 1/2
  
 # Run MPI containers
 
-- Approach 1
-- Launch MPI tasks within a container, no dependece on host
-- However can't expand to multiple nodes
+ - Approach 1
+     - Launch MPI tasks within a container, no dependece on host
+     - However can't expand to multiple nodes
+
 ```
 [wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
 Hello, I am on n0000.scs00 rank 0/2
@@ -533,10 +552,10 @@ Hello, I am on n0000.scs00 rank 1/2
 No Modulefiles Currently Loaded.
 ```
 
-- Approach 2
-- Launched MPI processes from the host
-- Rely on the MPI implementations provided on the host
-- Can expand to multple nodes
+ - Approach 2
+      - Launch MPI processes from the host
+      - Rely on the MPI implementations provided on the host
+      - Can expand to multiple nodes
 
 ```
 [wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
@@ -656,21 +675,9 @@ Tesla V100-SXM2-32GB
 
 # Other container resources
 
-- [San Diego supercomputing center training](https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/)
+- [San Diego supercomputing center training (big picture presentation)](https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/)
 - [XSEDE tutorial](https://github.com/XSEDE/Container_Tutorial)
 - [Software Carpentries Docker training](https://carpentries-incubator.github.io/docker-introduction/index.html)
 - [Software Carpentries Singularity training](https://carpentries-incubator.github.io/singularity-introduction/)
 
 
-# How to get additional help
-
- - Check the Status and Announcements page:
-    - [https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements](https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements)
- - For technical issues and questions about using Savio:
-    - brc-hpc-help@berkeley.edu
- - For questions about computing resources in general, including cloud computing:
-    - brc@berkeley.edu
-    - office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 [on Zoom](https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting)
- - For questions about data management (including HIPAA-protected data):
-    - researchdata@berkeley.edu
-    - office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 [on Zoom](https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting)

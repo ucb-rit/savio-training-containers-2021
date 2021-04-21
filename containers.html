@@ -58,6 +58,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><p><a href="https://www.meetup.com/ucberkeley_cloudmeetup/">Cloud Computing Meetup</a> (monthly, with next meeting April 29 at 1 pm)</p></li>
 <li><p><a href="https://dlab.berkeley.edu/working-groups/securing-research-data-working-group">Securing Research Data Working Group</a> (monthly, with next meeting May 10 at 2 pm)</p></li>
 </ul>
+<h1 id="how-to-get-additional-help">How to get additional help</h1>
+<ul>
+<li>Check the Status and Announcements page:
+<ul>
+<li><a href="https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements" class="uri">https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements</a></li>
+</ul></li>
+<li>For technical issues and questions about using Savio:
+<ul>
+<li>brc-hpc-help@berkeley.edu</li>
+</ul></li>
+<li>For questions about computing resources in general, including cloud computing:
+<ul>
+<li>brc@berkeley.edu</li>
+<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
+</ul></li>
+<li>For questions about data management (including HIPAA-protected data):
+<ul>
+<li>researchdata@berkeley.edu</li>
+<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
+</ul></li>
+</ul>
 <h1 id="introduction">Introduction</h1>
 <p>We'll do this mostly as a demonstration. We encourage you to login to your account and try out the various examples yourself as we go through them.</p>
 <p>The materials for this tutorial are available using git at the short URL (<a href="https://tinyurl.com/brc-apr21">tinyurl.com/brc-apr21</a>), the GitHub URL (<a href="https://github.com/ucb-rit/savio-training-containers-2021" class="uri">https://github.com/ucb-rit/savio-training-containers-2021</a>), or simply as a <a href="https://github.com/ucb-rit/savio-training-containers-2021/archive/main.zip">zip file</a>.</p>
@@ -189,25 +210,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>You can have GitHub Actions and Bitbucket Pipelines in a Docker container</li>
 <li>CodeOcean capsules are built on Docker images</li>
 </ul>
-<h1 id="running-pre-existing-containers-using-singularity">Running pre-existing containers using Singularity</h1>
+<h1 id="running-pre-existing-containers-using-singularity-pulling">Running pre-existing containers using Singularity: Pulling</h1>
 <ul>
 <li>No root/sudo privilege is needed</li>
 <li>Download or build immutable squashfs images/containers</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> pull --help</code></pre></div>
 <ul>
-<li><p>Pull a container from DockerHub.</p>
+<li>Pull a container from DockerHub.</li>
+</ul>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> pull docker://ubuntu:18.04 
 <span class="ex">singularity</span> pull docker://rocker/r-base:latest
 <span class="ex">singularity</span> pull docker://postgres
 <span class="fu">ls</span> -lrt <span class="kw">|</span> <span class="fu">tail</span> -n 10   # careful of your quota!
 <span class="fu">ls</span> -l ~/.singularity
-<span class="ex">singularity</span> cache list</code></pre></div></li>
-<li><p>Now run the container</p>
+<span class="ex">singularity</span> cache list</code></pre></div>
+<h1 id="running-pre-existing-containers-using-singularity-running">Running pre-existing containers using Singularity: Running</h1>
+<ul>
+<li>Now run the container</li>
+</ul>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run ubuntu_18.04.sif       # use downloaded image file
 <span class="co">## alternatively, use ~/.singularity/cache</span>
-<span class="ex">singularity</span> run docker://ubuntu:18.04  </code></pre></div></li>
-</ul>
+<span class="ex">singularity</span> run docker://ubuntu:18.04  </code></pre></div>
 <p>Note the change in prompt.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">cat</span> /etc/issue   # not the Savio OS!
 <span class="fu">which</span> python     # not much here!
@@ -298,11 +322,11 @@ $ <span class="ex">singularity</span> run hello-world.sif</code></pre></div>
 </ul></li>
 <li>Build from Singularity definition file
 <ul>
-<li>Bootstrap from another Singularity container or non-Docker base OS</li>
+<li>Bootstrap from another Singularity container, Docker image, or supported base OS</li>
 <li>Alows extra customization with directives</li>
 </ul></li>
 </ul>
-<h1 id="building-a-docker-container">Building a Docker container</h1>
+<h1 id="building-a-docker-container-demo">Building a Docker Container (Demo)</h1>
 <pre class="docker"><code>FROM centos:7
 RUN yum install -y epel-release &amp;&amp; yum install -y cowsay
 ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
@@ -310,7 +334,7 @@ ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
 <p>Build the container:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> build -t ghcr.io/nicolaschan/cowsay-entrypoint:latest -f cowsay-entrypoint .
 <span class="ex">docker</span> build -t ghcr.io/nicolaschan/cowsay-cmd:latest -f cowsay-cmd .</code></pre></div>
-<h1 id="running-docker-container">Running Docker container</h1>
+<h1 id="running-docker-container-demo">Running Docker Container (Demo)</h1>
 <p>ENTRYPOINT Docker container:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run ghcr.io/nicolaschan/cowsay-entrypoint hi</code></pre></div>
 <p>CMD Docker container (the following do the same thing):</p>
@@ -325,6 +349,7 @@ ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
 <ul>
 <li><code>singularity run docker://ghcr.io/nicolaschan/cowsay-entrypoint hi</code></li>
 <li><code>singularity build cowsay.simg docker://ghcr.io/nicolaschan/cowsay-entrypoint</code></li>
+<li><code>build</code> behaves similarly to <code>pull</code> in this context</li>
 </ul>
 <p>Reference: <a href="https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md" class="uri">https://github.com/ucb-rit/savio-singularity-template/blob/master/build_examples.md</a></p>
 <h1 id="singularity-build-strategies">Singularity Build Strategies</h1>
@@ -336,6 +361,7 @@ ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
 <li>Install Docker locally and use singularity-docker
 <ul>
 <li>https://github.com/singularityhub/singularity-docker</li>
+<li>Note: You must specify the version/tag such as <code>:3.7.1</code> for these images</li>
 </ul></li>
 <li>Build an image on a cloud service or continuous integration host
 <ul>
@@ -348,7 +374,13 @@ ENTRYPOINT [&quot;/usr/bin/cowsay&quot;]</code></pre>
 <li>Savio is x86_64</li>
 <li>Savio will try to bind mount the following paths by default (from <code>/etc/singularity/singularity.conf</code>):</li>
 </ul>
-<pre><code>bind path = /etc/localtime
+<pre><code>/etc/passwd
+/etc/resolv.conf
+/proc
+/sys
+/dev
+/tmp
+bind path = /etc/localtime
 bind path = /etc/hosts
 bind path = /global/scratch
 bind path = /global/home/users</code></pre>
@@ -357,7 +389,7 @@ bind path = /global/home/users</code></pre>
 <li><strong>Header</strong>: Base to build the container off of, such as an existing Docker/Singularity/OS image</li>
 <li><strong>Sections</strong>: Denoted by a <code>%</code> which are executed once the container is built to configure it</li>
 </ol>
-<p>Reference: https://sylabs.io/guides/3.0/user-guide/definition_files.html</p>
+<p>Reference: <a href="https://sylabs.io/guides/3.0/user-guide/definition_files.html" class="uri">https://sylabs.io/guides/3.0/user-guide/definition_files.html</a></p>
 <h1 id="singularity-build-example">Singularity Build Example</h1>
 <ul>
 <li>Building simple alpine asciiquarium image: <code>alpine-example.def</code></li>
@@ -366,24 +398,55 @@ bind path = /global/home/users</code></pre>
 <li><code>%post</code>: Executed within the container at build time</li>
 <li><code>%runscript</code>: Executed with <code>singularity run busybox-example.simg</code> or <code>./busybox-example.simg</code></li>
 </ul>
-<p>Reference: https://github.com/ucb-rit/savio-singularity-template</p>
-<h1 id="singularity-build-example-demo">Singularity Build Example (demo)</h1>
-<ul>
-<li><code>sudo singularity build alpine-example.simg alpine-example.def</code></li>
-<li><code>singularity run alpine-example.simg</code></li>
-<li><code>scp alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.</code></li>
-<li>On Savio: <code>singularity run alpine-example.simg</code></li>
-<li>On Savio: <code>singularity exec alpine-example.simg sh</code>
-<ul>
-<li><code>echo $MY_VAR_VALUE</code></li>
-</ul></li>
-</ul>
+<p>Reference: <a href="https://github.com/ucb-rit/savio-singularity-template" class="uri">https://github.com/ucb-rit/savio-singularity-template</a></p>
+<h1 id="singularity-definition-file-example">Singularity Definition File Example</h1>
+<pre><code>Bootstrap: docker
+From: alpine:latest
+
+%setup
+  # Executed on host system before container is built
+  echo &quot;Hello from setup&quot;
+
+%environment
+  export MY_VAR=my_var_value
+
+%post
+  # Executed within the container at build time
+  echo &quot;Post starting&quot;
+  apk add asciiquarium
+  mkdir -p /app
+  echo &#39;echo $MY_VAR&#39; &gt;&gt; /app/hello.sh
+  echo &quot;Post finished&quot;
+
+%runscript
+  # Executed with `singularity run alpine-example.simg` or `./alpine-example.simg`
+  asciiquarium</code></pre>
+<h1 id="singularity-build-example-demo">Singularity Build Example (Demo)</h1>
+<p>On local machine, using files from this repository: <a href="https://github.com/ucb-rit/savio-training-containers-2021" class="uri">https://github.com/ucb-rit/savio-training-containers-2021</a></p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">sudo</span> singularity build alpine-example.simg alpine-example.def
+<span class="ex">singularity</span> run alpine-example.simg
+<span class="fu">scp</span> alpine-example.simg nicolaschan@dtn.brc.berkeley.edu:.</code></pre></div>
+<p>On Savio:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> run alpine-example.simg
+<span class="ex">singularity</span> exec alpine-example.simg sh
+<span class="bu">echo</span> <span class="va">$MY_VAR_VALUE</span></code></pre></div>
+<p>If using singularity-docker:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker</span> run --privileged -t --rm -v <span class="va">$PWD</span>:/app quay.io/singularity/singularity:v3.7.1 \
+build /app/alpine-example.simg /app/alpine-example.def</code></pre></div>
 <h1 id="rewritablesandbox-singularity-images">Rewritable/Sandbox Singularity Images</h1>
 <ul>
-<li>Can be used for debugging software/images</li>
-<li>Prefer using a build script for reproducible builds</li>
+<li>Advantages:
+<ul>
+<li>Easier debugging (software installs, existing images, etc.)</li>
+<li>Container can be built on Savio</li>
+</ul></li>
+<li>Disadvantages:
+<ul>
+<li>Harder to rebuild reproducibly</li>
+<li>Some processes still require root (not just permissions for files)</li>
+</ul></li>
 </ul>
-<h1 id="rewritablesandbox-demo">Rewritable/Sandbox Demo</h1>
+<h1 id="rewritablesandbox-images-demo">Rewritable/Sandbox Images (Demo)</h1>
 <p>On Savio:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">singularity</span> build --sandbox alpine-sandbox docker://alpine
 <span class="ex">singularity</span> shell --writable alpine-sandbox
@@ -393,37 +456,43 @@ bind path = /global/home/users</code></pre>
 <span class="ex">singularity</span> build alpine-sandbox.sif alpine-sandbox/
 <span class="ex">./alpine-sandbox.sif</span>
 <span class="ex">hi</span></code></pre></div>
-<p>Reference: https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories</p>
+<p>Reference: <a href="https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories" class="uri">https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories</a></p>
 <h1 id="pushing-to-singularity-registry">Pushing to Singularity Registry</h1>
-<p>Similar to Docker registry, you can use the Singularity registry of your choice. This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work). For details, see https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html</p>
+<p>Similar to Docker registry, you can use the Singularity registry of your choice. This can be a convenient way to manage your images and transferring them to/from Savio (but normal file transfers also work). For details, see <a href="https://sylabs.io/guides/3.0/user-guide/build_a_container.html#creating-writable-sandbox-directories">https://sylabs.io/guides/3.1/user-guide/cli/singularity_push.html</a></p>
 <h1 id="outline-of-mpi-and-gpu-containers">Outline of MPI and GPU Containers</h1>
 <ul>
-<li>MPI (Message Passing Interface) applications can utilize multiple nodes</li>
-<li>Build and run MPI containers
+<li>Build singularity containers from a definition file</li>
+<li>Run MPI containers
 <ul>
-<li>Single node only</li>
-<li>Cross multiple nodes: Rely on the MPI implementation available on the host</li>
+<li>Rely on MPI library soly within the container: single node only</li>
+<li>Rely on the MPI library available on the host, multiple nodes possible</li>
 </ul></li>
 <li><p>MPI library version compatibility on the host and within containers</p></li>
-<li>Build GPU containers from a docker at NGC</li>
+<li>Build GPU singularity containers from a docker image</li>
 <li>Run GPU containers</li>
-<li><p>NVIDIA driver and CUDA version compatibility</p></li>
+<li><p>NVIDIA driver and CUDA library version compatibility</p></li>
 </ul>
-<h1 id="build-mpi-singularity-containers">Build MPI singularity containers</h1>
+<h1 id="mpi-application">MPI Application</h1>
 <ul>
 <li>MPI application example: <a href="samples/mpitest.c">mpitest.c</a></li>
 </ul>
-<pre><code>[wfeinstein@n0000 singularity-test]$ cat host 
+<pre><code>[wfeinstein@n0000 singularity] salloc -p lr6  -A account_xxx -N 2 -q lr_normal -t 2:0:0
+salloc: Pending job allocation 30456801
+salloc: job 30456801 queued and waiting for resources
+...
+salloc: Nodes n0098.lr6,n0099.lr6 are ready for job
+
+[wfeinstein@n0000 singularity-test]$ echo $SLURM_NODELIST |tr &#39;,&#39; &#39;\n&#39; &gt; host
 n0098.lr6
 n0099.lr6
 
-[wfeinstein@n0000 singularity]$ mpirun -np 4  --hostfile host mpitest
-...
+[wfeinstein@n0000 singularity]$ mpirun -np 4 --hostfile host -npernode 2 mpitest
 Hello, I am on n0098.lr6 rank 3/4
-Hello, I am on n0098.lr6 rank 3/4
+Hello, I am on n0099.lr6 rank 3/4
+Hello, I am on n0098.lr6 rank 2/4
 Hello, I am on n0099.lr6 rank 2/4
-Hello, I am on n0099.lr6 rank 2/4
-...</code></pre>
+</code></pre>
+<h1 id="build-mpi-singularity-containers">Build MPI singularity containers</h1>
 <ul>
 <li><p>Definition file<br />
 <a href="samples/SINGULARITY-mpi3.1.0.def">SINGULARITY-mpi3.1.0.def</a></p></li>
@@ -444,8 +513,11 @@ Hello, I am on n0000.scs00 rank 0/2
 Hello, I am on n0000.scs00 rank 1/2</code></pre>
 <h1 id="run-mpi-containers">Run MPI containers</h1>
 <ul>
-<li>Use MPI libraries soly within a container</li>
-<li>MPI tasks are launched within a container, no dependence on host, however can't expand to multiple nodes</li>
+<li>Approach 1
+<ul>
+<li>Launch MPI tasks within a container, no dependece on host</li>
+<li>However can't expand to multiple nodes</li>
+</ul></li>
 </ul>
 <pre><code>[wfeinstein@n0000 singularity-test]$ singularity exec mpi3.1.0.sif  /opt/ompi/bin/mpirun -np 2 /opt/mpitest
 Hello, I am on n0000.scs00 rank 0/2
@@ -454,8 +526,12 @@ Hello, I am on n0000.scs00 rank 1/2
 [wfeinstein@n0000 singularity-test]$ module list
 No Modulefiles Currently Loaded.</code></pre>
 <ul>
-<li>Rely on the MPI implementation available on the host</li>
+<li>Approach 2
+<ul>
+<li>Launch MPI processes from the host</li>
+<li>Rely on the MPI implementations provided on the host</li>
 <li>Can expand to multiple nodes</li>
+</ul></li>
 </ul>
 <pre><code>[wfeinstein@n0000 singularity-test]$ mpirun -np 64 --hostfile host singularity exec mpi3.1.0.sif /opt/mpitest
 ...
@@ -519,20 +595,18 @@ Hello, I am on n0098.lr6 rank 1/4
 <li>--nv enables NVIDIA GPU support by providing the driver on the host</li>
 </ul></li>
 <li>NVIDIA driver not present in the container image itself</li>
-<li>Application built against a CUDA toolchain has a minimal host NVIDIA driver requirement
+<li>Application built against a CUDA toolkit has a minimal host NVIDIA driver requirement
 <ul>
 <li>e.g., CUDA/11.2 requires NVIDIA driver &gt;= R450</li>
 </ul></li>
-<li>Host driver version requirements are detailed in <a href="https://docs.nvidia.com/deploy/cuda-compatibility/index.html">NGC documentation</a></li>
+<li>Minimal driver requirement for a specific version of the CUDA runtime/toolkit, <a href="https://docs.nvidia.com/deploy/cuda-compatibility/index.html">check it out here</a></li>
 </ul>
 <h1 id="gpu-container-examples">GPU container examples</h1>
 <ul>
-<li>Build PyTorch GPU container from <a href="https://ngc.nvidia.com/catalog/containers/nvidia:pytorch">PyTorch Docker NGC registry</a></li>
-</ul>
+<li><p>Build PyTorch GPU containers from the <a href="https://ngc.nvidia.com/catalog/containers/nvidia:pytorch">NGC registry</a></p>
 <pre><code>docker pull nvcr.io/nvidia/pytorch:21.03-py3:21.03-py3
-singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</code></pre>
-<ul>
-<li>Run PyTorch on a GPU node</li>
+singularity build pytorch_21.03_py3.sif docker-daemon://nvcr.io/nvidia/pytorch:21.03-py3</code></pre></li>
+<li><p>Run PyTorch on a GPU node</p></li>
 </ul>
 <pre><code>[wfeinstein@n0043 pytorch]$ nvidia-smi -L
 GPU 0: Tesla V100-SXM2-32GB (UUID: GPU-df6fb04c-b0a4-69cc-98a2-763783d4e152)
@@ -544,43 +618,28 @@ Mon Apr 19 00:32:43 2021
 | NVIDIA-SMI 440.44       Driver Version: 440.44       CUDA Version: 10.2     |
 ...
 
-[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
+[wfeinstein@n0043 pytorch]$ cat pytorch_test.py
+import torch; 
+print(torch.__version__);
+print(torch.cuda.get_device_name(0)); 
+print(torch.version.cuda)
+
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_21.03_py3.sif python pytorch_test.py
 1.9.0a0+df837d0
 Tesla V100-SXM2-32GB
 11.2
 
-[wfeinstein@n0043 singularity-test]$ singularity exec --nv ../pytorch/pytorch_19_12_py3.sif  python -c &quot;import torch; print(torch.__version__);print(torch.cuda.get_device_name(0)); print(torch.version.cuda)&quot;
+[wfeinstein@n0043 pytorch]$ singularity exec --nv pytorch_19_12_py3.sif python pytorch_test.py
 1.4.0a0+a5b4d78
 Tesla V100-SXM2-32GB
 10.2</code></pre>
 <h1 id="olivers-content">Oliver's content</h1>
 <h1 id="other-container-resources">Other container resources</h1>
 <ul>
-<li><a href="https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/">San Diego supercomputing center training</a></li>
+<li><a href="https://education.sdsc.edu/training/interactive/202101_intro_to_singularity/">San Diego supercomputing center training (big picture presentation)</a></li>
 <li><a href="https://github.com/XSEDE/Container_Tutorial">XSEDE tutorial</a></li>
 <li><a href="https://carpentries-incubator.github.io/docker-introduction/index.html">Software Carpentries Docker training</a></li>
 <li><a href="https://carpentries-incubator.github.io/singularity-introduction/">Software Carpentries Singularity training</a></li>
-</ul>
-<h1 id="how-to-get-additional-help">How to get additional help</h1>
-<ul>
-<li>Check the Status and Announcements page:
-<ul>
-<li><a href="https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements" class="uri">https://research-it.berkeley.edu/services/high-performance-computing/status-and-announcements</a></li>
-</ul></li>
-<li>For technical issues and questions about using Savio:
-<ul>
-<li>brc-hpc-help@berkeley.edu</li>
-</ul></li>
-<li>For questions about computing resources in general, including cloud computing:
-<ul>
-<li>brc@berkeley.edu</li>
-<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
-</ul></li>
-<li>For questions about data management (including HIPAA-protected data):
-<ul>
-<li>researchdata@berkeley.edu</li>
-<li>office hours: office hours: Wed. 1:30-3:00 and Thur. 9:30-11:00 <a href="https://research-it.berkeley.edu/programs/berkeley-research-computing/research-computing-consulting">on Zoom</a></li>
-</ul></li>
 </ul>
 </body>
 </html>
