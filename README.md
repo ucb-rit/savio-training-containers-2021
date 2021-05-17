@@ -4,9 +4,9 @@ Materials for Savio containers training for April 21, 2021.
 
 The main document is `containers.html` (or `containers_slides.html` if you prefer a version that appears in slide-show format rather than as one long HTML page).
 
-To directly view the HTML, please [click here](https://htmlpreview.github.io/?https://github.com/ucb-rit/savio-training-containers-2021/blob/master/containers_slides.html).
+To directly view the HTML, please [click here](https://htmlpreview.github.io/?https://github.com/ucb-rit/savio-training-containers-2021/blob/main/containers_slides.html).
 
-If you're not familiar with Git or Github you can download the materials as a [zip file](https://github.com/ucb-rit/savio-training-containers-2021/archive/master.zip)
+If you're not familiar with Git or Github you can download the materials as a [zip file](https://github.com/ucb-rit/savio-training-containers-2021/archive/main.zip)
 
 This material is also available at [https://tinyurl.com/brc-apr21](https://tinyurl.com/brc-feb21).
 
